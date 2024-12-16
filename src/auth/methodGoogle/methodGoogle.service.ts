@@ -1,6 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { AuthShareService } from '../authShare.service';
 import { UsersService } from 'src/users/users.service';
+import {
+  HttpResponseSuccess,
+  ThrowHttpException,
+} from 'src/common/utils/http-response.util';
+import { HttpResponseStatus } from 'src/common/constants/custom-http-status.constant';
 
 @Injectable()
 export class MethodGoogleService {
@@ -8,8 +13,17 @@ export class MethodGoogleService {
     private readonly authShareService: AuthShareService,
     private readonly usersService: UsersService,
   ) {}
+
   async authenticationWithGoogle(idToken: string): Promise<any> {
     const payload = await this.authShareService.verifyGoogleToken(idToken);
+
+    if (!payload) {
+      ThrowHttpException(
+        'El token de Google no es válido.',
+        HttpResponseStatus.UNAUTHORIZED,
+      );
+    }
+
     const userFind = await this.usersService.findByEmail(payload.email);
 
     const methods = userFind?.authMethods || [];
@@ -37,9 +51,9 @@ export class MethodGoogleService {
       image: userFind?.image || payload.picture,
     };
 
-    return {
+    return HttpResponseSuccess('Autenticación con Google exitosa.', {
       token: this.authShareService.createToken({ user: createPayload }),
       user: createPayload,
-    };
+    });
   }
 }

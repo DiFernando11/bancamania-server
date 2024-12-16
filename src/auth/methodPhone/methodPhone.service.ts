@@ -1,10 +1,12 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Usuario } from 'src/users/users.entity';
 import { Repository } from 'typeorm';
 import { AuthShareService } from '../authShare.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UsersService } from 'src/users/users.service';
 import { FirebaseService } from 'src/firebase/firebase.service';
+import { HttpResponseSuccess, ThrowHttpException } from 'src/common/utils';
+import { HttpResponseStatus } from 'src/common/constants';
 
 @Injectable()
 export class MethodPhoneService {
@@ -23,7 +25,10 @@ export class MethodPhoneService {
       return code;
     } catch (error) {
       console.log(error, 'ERROR ENVIANDO CODIGO');
-      throw new BadRequestException('Error al enviar un codigo a tu telefono');
+      ThrowHttpException(
+        'Error al enviar un código a tu teléfono',
+        HttpResponseStatus.BAD_REQUEST,
+      );
     }
   }
   async sendCodePhone({ phone }) {
@@ -33,10 +38,9 @@ export class MethodPhoneService {
     });
     console.log({ code });
     await this.sendCodeToPhone({ phone, code });
-    return {
-      message:
-        'Codigo de verificacion Enviado correctamente, revisa tu celular',
-    };
+    return HttpResponseSuccess(
+      'Código de verificación enviado correctamente, revisa tu celular.',
+    );
   }
 
   async validateCodePhone({ code, phone }) {
@@ -47,8 +51,9 @@ export class MethodPhoneService {
     const isVerify = codeSaved.code === code;
 
     if (!isVerify) {
-      throw new BadRequestException(
-        'Codigo no valido por favor verifica tu codigo en tu celular',
+      ThrowHttpException(
+        'Código no válido, por favor verifica tu código en tu celular',
+        HttpResponseStatus.BAD_REQUEST,
       );
     }
 
@@ -78,10 +83,10 @@ export class MethodPhoneService {
     await this.firebaseService.updateCodeExpireById(codeSaved.id, 5, {
       isValidatedCode: true,
     });
-    return {
-      message: 'Vincula tu dispositivo a tu correo electronico para continuar',
-      isUserRegistered,
-    };
+    return HttpResponseSuccess(
+      'Vincula tu dispositivo a tu correo electrónico para continuar.',
+      { isUserRegistered },
+    );
   }
 
   async registerWithPhoneGoogle({ phone, idToken }) {
@@ -91,15 +96,19 @@ export class MethodPhoneService {
     });
 
     if (!codeSaved.isValidatedCode) {
-      throw new BadRequestException(`Verifica tu celuar antes de continuar`);
+      ThrowHttpException(
+        'Verifica tu celular antes de continuar',
+        HttpResponseStatus.BAD_REQUEST,
+      );
     }
 
     const payload = await this.authShareService.verifyGoogleToken(idToken);
     const user = await this.usersService.findByEmail(payload.email);
 
     if (user?.authMethods?.includes('phone')) {
-      throw new BadRequestException(
-        `El correo electronico ${payload.email} se encuentra vinculado al telefono con numero ${phone}}`,
+      ThrowHttpException(
+        `El correo electrónico ${payload.email} ya está vinculado al teléfono ${phone}`,
+        HttpResponseStatus.BAD_REQUEST,
       );
     }
 
@@ -128,10 +137,12 @@ export class MethodPhoneService {
       image: user?.image || payload.picture,
       phone,
     };
-    return {
-      message: 'Authenticacion con celular ejecutada con exito',
-      token: this.authShareService.createToken({ user: createPayload }),
-      user: createPayload,
-    };
+    return HttpResponseSuccess(
+      'Autenticación con celular ejecutada con éxito',
+      {
+        token: this.authShareService.createToken({ user: createPayload }),
+        user: createPayload,
+      },
+    );
   }
 }
