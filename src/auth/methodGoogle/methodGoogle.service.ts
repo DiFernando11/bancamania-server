@@ -6,12 +6,14 @@ import {
   ThrowHttpException,
 } from 'src/common/utils/http-response.util';
 import { HttpResponseStatus } from 'src/common/constants/custom-http-status.constant';
+import { I18nService } from 'nestjs-i18n';
 
 @Injectable()
 export class MethodGoogleService {
   constructor(
     private readonly authShareService: AuthShareService,
     private readonly usersService: UsersService,
+    private readonly i18n: I18nService,
   ) {}
 
   async authenticationWithGoogle(idToken: string): Promise<any> {
@@ -19,13 +21,12 @@ export class MethodGoogleService {
 
     if (!payload) {
       ThrowHttpException(
-        'El token de Google no es válido.',
+        this.i18n.t('auth.INVALID_GOOGLE_TOKEN'),
         HttpResponseStatus.UNAUTHORIZED,
       );
     }
 
     const userFind = await this.usersService.findByEmail(payload.email);
-
     const methods = userFind?.authMethods || [];
 
     if (!userFind?.authMethods?.includes('google')) {
@@ -51,7 +52,7 @@ export class MethodGoogleService {
       image: userFind?.image || payload.picture,
     };
 
-    return HttpResponseSuccess('Autenticación con Google exitosa.', {
+    return HttpResponseSuccess(this.i18n.t('auth.GOOGLE_AUTH_SUCCESS'), {
       token: this.authShareService.createToken({ user: createPayload }),
       user: createPayload,
     });

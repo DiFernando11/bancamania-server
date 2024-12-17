@@ -7,6 +7,7 @@ import { CreateUserCredentialsDto } from './dto/register.dto';
 import { FirebaseService } from 'src/firebase/firebase.service';
 import { HttpResponseStatus } from 'src/common/constants';
 import { HttpResponseSuccess, ThrowHttpException } from 'src/common/utils';
+import { I18nService } from 'nestjs-i18n';
 
 @Injectable()
 export class MethodCredentialsService {
@@ -15,6 +16,7 @@ export class MethodCredentialsService {
     private readonly usersService: UsersService,
     private readonly mailService: MailService,
     private readonly firebaseService: FirebaseService,
+    private readonly i18n: I18nService,
   ) {}
 
   async sendCodeRegisterCredentials({ email }: { email: string }) {
@@ -22,10 +24,11 @@ export class MethodCredentialsService {
 
     if (user && user?.authMethods?.includes('credentials')) {
       ThrowHttpException(
-        'Este correo electrónico ya está registrado',
+        this.i18n.t('auth.EMAIL_ALREADY_REGISTERED', { args: { email } }),
         HttpResponseStatus.UNAUTHORIZED,
       );
     }
+
     const code = await this.firebaseService.createCode({
       data: { email },
       feature: 'registerCredentials',
@@ -37,13 +40,14 @@ export class MethodCredentialsService {
     });
 
     return HttpResponseSuccess(
-      `Se ha enviado tu código de verificación al correo ${email}`,
+      this.i18n.t('auth.VERIFICATION_CODE_MAIL_SENT', { args: { email } }),
       {
         firstName: user?.first_name,
         lastName: user?.last_name,
       },
     );
   }
+
   async registerWithCredentials({
     email,
     password,
@@ -55,19 +59,20 @@ export class MethodCredentialsService {
       email,
       feature: 'registerCredentials',
     });
+
     const isVerify = codeSaved.code === code;
 
     if (!isVerify) {
       ThrowHttpException(
-        'Código no válido. Por favor, verifica tu código en tu correo',
+        this.i18n.t('auth.INVALID_CODE'),
         HttpResponseStatus.BAD_REQUEST,
       );
     }
+
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(password, salt);
 
     const user = await this.usersService.findByEmail(email);
-
     const methods = user?.authMethods || [];
 
     await this.usersService.createOrUpdateUser({
@@ -92,7 +97,7 @@ export class MethodCredentialsService {
     };
 
     return HttpResponseSuccess(
-      'Registro exitoso',
+      this.i18n.t('auth.REGISTRATION_SUCCESS'),
       {
         token: this.authShareService.createToken({
           user: createPayload,
@@ -106,17 +111,19 @@ export class MethodCredentialsService {
 
   async loginWithCredentials(email: string, password: string) {
     const user = await this.usersService.findByEmail(email);
+
     if (!user) {
       ThrowHttpException(
-        'Credenciales inválidas. El correo no existe o aún no te has registrado.',
+        this.i18n.t('auth.CRED_LOGIN_MAIL_INVALID'),
         HttpResponseStatus.UNAUTHORIZED,
       );
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
+
     if (!isPasswordValid) {
       ThrowHttpException(
-        'Credenciales inválidas. Contraseña incorrecta.',
+        this.i18n.t('auth.INVALID_CREDENTIALS'),
         HttpResponseStatus.UNAUTHORIZED,
       );
     }
@@ -129,7 +136,7 @@ export class MethodCredentialsService {
       phone: user.phone_number,
     };
 
-    return HttpResponseSuccess('Inicio de sesión exitoso.', {
+    return HttpResponseSuccess(this.i18n.t('auth.LOGIN_SUCCESS'), {
       token: this.authShareService.createToken({
         user: createPayload,
       }),

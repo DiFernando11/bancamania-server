@@ -5,8 +5,12 @@ import { AuthShareService } from '../authShare.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UsersService } from 'src/users/users.service';
 import { FirebaseService } from 'src/firebase/firebase.service';
-import { HttpResponseSuccess, ThrowHttpException } from 'src/common/utils';
-import { HttpResponseStatus } from 'src/common/constants';
+import {
+  HttpResponseSuccess,
+  ThrowHttpException,
+} from 'src/common/utils/http-response.util';
+import { HttpResponseStatus } from 'src/common/constants/custom-http-status.constant';
+import { I18nService } from 'nestjs-i18n';
 
 @Injectable()
 export class MethodPhoneService {
@@ -16,31 +20,31 @@ export class MethodPhoneService {
     private readonly authShareService: AuthShareService,
     private readonly usersService: UsersService,
     private readonly firebaseService: FirebaseService,
+    private readonly i18n: I18nService,
   ) {}
 
   async sendCodeToPhone({ phone, code }) {
     try {
-      //   const value = await this.whatsappService.sendVerificationCode(phone);
       console.log(phone, code.verificationCode, 'SEND WHATSAPP');
       return code;
     } catch (error) {
-      console.log(error, 'ERROR ENVIANDO CODIGO');
+      console.error(error, 'ERROR ENVIANDO CODIGO');
       ThrowHttpException(
-        'Error al enviar un código a tu teléfono',
+        this.i18n.t('phone.SEND_CODE_ERROR'),
         HttpResponseStatus.BAD_REQUEST,
       );
     }
   }
+
   async sendCodePhone({ phone }) {
     const code = await this.firebaseService.createCode({
       data: { phone, isValidatedCode: false },
       feature: 'authPhone',
     });
-    console.log({ code });
+
     await this.sendCodeToPhone({ phone, code });
-    return HttpResponseSuccess(
-      'Código de verificación enviado correctamente, revisa tu celular.',
-    );
+
+    return HttpResponseSuccess(this.i18n.t('phone.VERIFICATION_CODE_SENT'));
   }
 
   async validateCodePhone({ code, phone }) {
@@ -48,11 +52,12 @@ export class MethodPhoneService {
       phone,
       feature: 'authPhone',
     });
+
     const isVerify = codeSaved.code === code;
 
     if (!isVerify) {
       ThrowHttpException(
-        'Código no válido, por favor verifica tu código en tu celular',
+        this.i18n.t('phone.INVALID_VERIFICATION_CODE'),
         HttpResponseStatus.BAD_REQUEST,
       );
     }
@@ -71,22 +76,20 @@ export class MethodPhoneService {
 
     if (isUserRegistered) {
       await this.firebaseService.deleteCodeById(codeSaved.id);
-      return {
-        message: 'Login exitoso',
+      return HttpResponseSuccess(this.i18n.t('phone.LOGIN_SUCCESS'), {
         isUserRegistered,
-        token: this.authShareService.createToken({
-          user: createPayload,
-        }),
+        token: this.authShareService.createToken({ user: createPayload }),
         user: createPayload,
-      };
+      });
     }
+
     await this.firebaseService.updateCodeExpireById(codeSaved.id, 5, {
       isValidatedCode: true,
     });
-    return HttpResponseSuccess(
-      'Vincula tu dispositivo a tu correo electrónico para continuar.',
-      { isUserRegistered },
-    );
+
+    return HttpResponseSuccess(this.i18n.t('phone.LINK_PHONE_EMAIL'), {
+      isUserRegistered,
+    });
   }
 
   async registerWithPhoneGoogle({ phone, idToken }) {
@@ -97,7 +100,7 @@ export class MethodPhoneService {
 
     if (!codeSaved.isValidatedCode) {
       ThrowHttpException(
-        'Verifica tu celular antes de continuar',
+        this.i18n.t('phone.PHONE_NOT_VERIFIED'),
         HttpResponseStatus.BAD_REQUEST,
       );
     }
@@ -107,7 +110,9 @@ export class MethodPhoneService {
 
     if (user?.authMethods?.includes('phone')) {
       ThrowHttpException(
-        `El correo electrónico ${payload.email} ya está vinculado al teléfono ${phone}`,
+        this.i18n.t('phone.PHONE_ALREADY_REGISTERED', {
+          args: { phone, email: payload.email },
+        }),
         HttpResponseStatus.BAD_REQUEST,
       );
     }
@@ -137,12 +142,14 @@ export class MethodPhoneService {
       image: user?.image || payload.picture,
       phone,
     };
+
     return HttpResponseSuccess(
-      'Autenticación con celular ejecutada con éxito',
+      this.i18n.t('phone.REGISTRATION_SUCCESS'),
       {
         token: this.authShareService.createToken({ user: createPayload }),
         user: createPayload,
       },
+      HttpResponseStatus.CREATED,
     );
   }
 }

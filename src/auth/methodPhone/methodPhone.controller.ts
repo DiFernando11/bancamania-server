@@ -1,4 +1,4 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode } from '@nestjs/common';
 import { MethodPhoneService } from './methodPhone.service';
 import {
   RegisterPhone,
@@ -12,6 +12,7 @@ export class MethodPhoneController {
   constructor(private readonly methodPhoneService: MethodPhoneService) {}
 
   @Post('sendCode')
+  @HttpCode(200)
   async sendCodePhone(@Body() registerPhoneDto: RegisterPhoneDto) {
     return this.methodPhoneService.sendCodePhone({
       phone: registerPhoneDto.phone,
@@ -19,6 +20,7 @@ export class MethodPhoneController {
   }
 
   @Post('login')
+  @HttpCode(200)
   async validateCodePhone(
     @Body() validatePhoneRegister: ValidatePhoneRegister,
   ) {
@@ -38,12 +40,4 @@ export class MethodPhoneController {
       phone: registerPhone.phone,
     });
   }
-
-  // @Post('login')
-  // async loginWithPhone(
-  //   @Body()
-  //   loginToken: TokenDto,
-  // ) {
-  //   return this.methodPhoneService.loginWithPhone(loginToken.idToken);
-  // }
 }

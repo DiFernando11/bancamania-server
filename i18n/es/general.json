@@ -1,0 +1,6 @@
+{
+  "VALIDATION_FAILED": "Errores de validación detectados.",
+  "REQUIRED_FIELD": "El campo {{field}} es obligatorio.",
+  "MIN_LENGTH": "El campo {{field}} debe tener al menos {{length}} caracteres."
+}
+  
