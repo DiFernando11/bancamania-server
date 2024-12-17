@@ -1,6 +1,11 @@
 import { Body, Controller, HttpCode, Post } from '@nestjs/common'
-import { EmailDto } from '../dto/register.dto'
-import { CreateUserCredentialsDto, LoginDto } from './dto/register.dto'
+import {
+  PromiseApiAuthResponse,
+  PromiseApiResponse,
+} from '@/src/common/types/apiResponse'
+import { EmailDto } from '@/src/dtos'
+import { SendCodeRegister } from '@/src/modules/auth/methodCredentials/types'
+import { AuthBaseDto, CreateUserCredentialsDto } from './dto/register.dto'
 import { MethodCredentialsService } from './methodCredentials.service'
 
 @Controller('auth/credentials')
@@ -11,7 +16,9 @@ export class MethodCredentialsController {
 
   @Post('sendCode')
   @HttpCode(200)
-  async sendCodeRegisterCredentials(@Body() createUserDto: EmailDto) {
+  async sendCodeRegisterCredentials(
+    @Body() createUserDto: EmailDto
+  ): PromiseApiResponse<SendCodeRegister> {
     return await this.methodCredentialsService.sendCodeRegisterCredentials({
       email: createUserDto.email,
     })
@@ -20,7 +27,7 @@ export class MethodCredentialsController {
   @Post('register')
   async registerWithCredentials(
     @Body() createUserDto: CreateUserCredentialsDto
-  ) {
+  ): PromiseApiAuthResponse {
     return await this.methodCredentialsService.registerWithCredentials({
       code: createUserDto.code,
       email: createUserDto.email,
@@ -32,10 +39,12 @@ export class MethodCredentialsController {
 
   @Post('login')
   @HttpCode(200)
-  async loginWithCredentials(@Body() loginDto: LoginDto) {
-    return await this.methodCredentialsService.loginWithCredentials(
-      loginDto.email,
-      loginDto.password
-    )
+  async loginWithCredentials(
+    @Body() loginDto: AuthBaseDto
+  ): PromiseApiAuthResponse {
+    return await this.methodCredentialsService.loginWithCredentials({
+      email: loginDto.email,
+      password: loginDto.password,
+    })
   }
 }

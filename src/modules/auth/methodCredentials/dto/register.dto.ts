@@ -1,14 +1,10 @@
 import { IsEmail, IsNotEmpty, IsString, Length } from 'class-validator'
+import { PasswordDto } from '@/src/dtos'
 
-export class AuthBaseDto {
+export class AuthBaseDto extends PasswordDto {
   @IsEmail({}, { message: 'EMAIL_INVALID' })
   @IsNotEmpty({ message: 'EMAIL_REQUIRED' })
   email: string
-
-  @IsString({ message: 'PASSWORD_STRING' })
-  @IsNotEmpty({ message: 'PASSWORD_REQUIRED' })
-  @Length(8, 20, { message: 'PASSWORD_MIN_LENGTH' })
-  password: string
 }
 
 export class CreateUserCredentialsDto extends AuthBaseDto {
@@ -24,14 +20,3 @@ export class CreateUserCredentialsDto extends AuthBaseDto {
   @Length(6, 6, { message: 'CODE_LENGTH' })
   code: string
 }
-
-export class ValidateCodeDto {
-  @IsNotEmpty({ message: 'CODE_REQUIRED' })
-  @Length(6, 6, { message: 'CODE_LENGTH' })
-  code: string
-
-  @IsNotEmpty({ message: 'TOKEN_REQUIRED' })
-  idToken: string
-}
-
-export class LoginDto extends AuthBaseDto {}

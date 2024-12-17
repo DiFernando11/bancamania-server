@@ -8,7 +8,6 @@
       "files.eol": "\n",
       "files.trimTrailingWhitespace": true,
       "files.insertFinalNewline": true,
-      "typescript.preferences.importModuleSpecifier": "relative",
       "typescript.updateImportsOnFileMove.enabled": "always",
       "prettier.requireConfig": true,
       "editor.defaultFormatter": "esbenp.prettier-vscode",
@@ -26,4 +25,6 @@
       "editor.bracketPairColorization.enabled": true,
       "editor.guides.bracketPairs": true,
       "editor.rulers": [80],
+      "typescript.preferences.importModuleSpecifier": "non-relative",
+      "typescript.tsdk": "node_modules/typescript/lib"
 }

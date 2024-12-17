@@ -1,11 +1,9 @@
 import { Injectable } from '@nestjs/common'
 import { I18nService } from 'nestjs-i18n'
-import { HttpResponseStatus } from 'src/common/constants/custom-http-status.constant'
-import {
-  HttpResponseSuccess,
-  ThrowHttpException,
-} from 'src/common/utils/http-response.util'
-import { UsersService } from 'src/modules/users/users.service'
+import { HttpResponseStatus } from '@/src/common/constants'
+import { PromiseApiAuthResponse } from '@/src/common/types/apiResponse'
+import { HttpResponseSuccess, ThrowHttpException } from '@/src/common/utils'
+import { UsersService } from '@/src/modules/users/users.service'
 import { AuthShareService } from '../authShare.service'
 
 @Injectable()
@@ -16,7 +14,7 @@ export class MethodGoogleService {
     private readonly i18n: I18nService
   ) {}
 
-  async authenticationWithGoogle(idToken: string): Promise<any> {
+  async authenticationWithGoogle(idToken: string): PromiseApiAuthResponse {
     const payload = await this.authShareService.verifyGoogleToken(idToken)
 
     if (!payload) {
