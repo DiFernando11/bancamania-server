@@ -1,7 +1,7 @@
-import { Controller, Post, Body, HttpCode } from '@nestjs/common'
-import { MethodCredentialsService } from './methodCredentials.service'
-import { CreateUserCredentialsDto, LoginDto } from './dto/register.dto'
+import { Body, Controller, HttpCode, Post } from '@nestjs/common'
 import { EmailDto } from '../dto/register.dto'
+import { CreateUserCredentialsDto, LoginDto } from './dto/register.dto'
+import { MethodCredentialsService } from './methodCredentials.service'
 
 @Controller('auth/credentials')
 export class MethodCredentialsController {
@@ -22,11 +22,11 @@ export class MethodCredentialsController {
     @Body() createUserDto: CreateUserCredentialsDto
   ) {
     return await this.methodCredentialsService.registerWithCredentials({
+      code: createUserDto.code,
       email: createUserDto.email,
-      password: createUserDto.password,
       firstName: createUserDto.firstName,
       lastName: createUserDto.lastName,
-      code: createUserDto.code,
+      password: createUserDto.password,
     })
   }
 

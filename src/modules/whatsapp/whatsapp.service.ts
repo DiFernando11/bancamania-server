@@ -1,4 +1,4 @@
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common'
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import axios from 'axios'
 
@@ -21,14 +21,14 @@ export class WhatsappService {
 
     const payload = {
       messaging_product: 'whatsapp',
-      to,
-      type: 'template',
       template: {
-        name: 'hello_world',
         language: {
           code: 'en_US',
         },
+        name: 'hello_world',
       },
+      to,
+      type: 'template',
     }
 
     try {

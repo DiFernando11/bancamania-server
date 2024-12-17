@@ -1,13 +1,11 @@
 import { Module } from '@nestjs/common'
-import { TypeOrmModule } from '@nestjs/typeorm' // Importa TypeOrmModule
-import { Usuario } from './users.entity' // Asegúrate de importar la entidad Usuario
-import { UsersService } from './users.service' // Asegúrate de importar el servicio
+import { TypeOrmModule } from '@nestjs/typeorm'
+import { Usuario } from './users.entity'
+import { UsersService } from './users.service'
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Usuario]), // Importa la entidad Usuario
-  ],
-  providers: [UsersService], // Declara el UsersService como proveedor
-  exports: [UsersService], // Exporta UsersService para que pueda ser utilizado en otros módulos (como AuthModule)
+  exports: [UsersService],
+  imports: [TypeOrmModule.forFeature([Usuario])],
+  providers: [UsersService],
 })
 export class UsersModule {}

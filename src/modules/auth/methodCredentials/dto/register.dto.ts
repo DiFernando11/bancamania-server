@@ -1,4 +1,4 @@
-import { IsEmail, IsString, IsNotEmpty, Length } from 'class-validator'
+import { IsEmail, IsNotEmpty, IsString, Length } from 'class-validator'
 
 export class AuthBaseDto {
   @IsEmail({}, { message: 'EMAIL_INVALID' })

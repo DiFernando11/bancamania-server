@@ -1,27 +1,27 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common'
-import { v4 as uuidv4 } from 'uuid'
-import { FirebaseApp, initializeApp } from 'firebase/app'
 import { ConfigService } from '@nestjs/config'
+import { FirebaseApp, initializeApp } from 'firebase/app'
 import {
-  CollectionReference,
-  Firestore,
-  getFirestore,
   collection,
-  setDoc,
-  DocumentReference,
-  doc,
-  query,
-  QuerySnapshot,
-  getDocs,
-  where,
-  QueryDocumentSnapshot,
-  serverTimestamp,
-  orderBy,
-  limit,
+  CollectionReference,
   deleteDoc,
-  updateDoc,
+  doc,
+  DocumentReference,
+  Firestore,
+  getDocs,
+  getFirestore,
+  limit,
+  orderBy,
+  query,
+  QueryDocumentSnapshot,
+  QuerySnapshot,
+  serverTimestamp,
+  setDoc,
   Timestamp,
+  updateDoc,
+  where,
 } from 'firebase/firestore'
+import { v4 as uuidv4 } from 'uuid'
 import { CodeDocument, CodeDocumentResponse, CreateCode } from './types'
 
 @Injectable()
@@ -35,13 +35,13 @@ export class FirebaseService {
   constructor(private readonly configService: ConfigService) {
     this.app = initializeApp({
       apiKey: this.configService.get<string>('firebase.apiKey'),
+      appId: this.configService.get<string>('firebase.appId'),
       authDomain: this.configService.get<string>('firebase.authDomain'),
-      projectId: this.configService.get<string>('firebase.projectId'),
-      storageBucket: this.configService.get<string>('firebase.storageBucket'),
       messagingSenderId: this.configService.get<string>(
         'firebase.messagingSenderId'
       ),
-      appId: this.configService.get<string>('firebase.appId'),
+      projectId: this.configService.get<string>('firebase.projectId'),
+      storageBucket: this.configService.get<string>('firebase.storageBucket'),
     })
 
     this.firestore = getFirestore(this.app)
@@ -65,10 +65,10 @@ export class FirebaseService {
       const code = uuidv4().slice(0, 6)
       await setDoc(docRef, {
         ...data,
-        feature,
-        expireAt: verificationExpiresAt,
         code,
         createdAt: serverTimestamp(),
+        expireAt: verificationExpiresAt,
+        feature,
       })
 
       return code

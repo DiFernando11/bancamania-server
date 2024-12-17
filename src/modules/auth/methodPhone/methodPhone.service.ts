@@ -1,16 +1,16 @@
 import { Injectable } from '@nestjs/common'
-import { Usuario } from 'src/modules/users/users.entity'
-import { Repository } from 'typeorm'
-import { AuthShareService } from '../authShare.service'
 import { InjectRepository } from '@nestjs/typeorm'
-import { UsersService } from 'src/modules/users/users.service'
-import { FirebaseService } from 'src/modules/firebase/firebase.service'
+import { I18nService } from 'nestjs-i18n'
+import { HttpResponseStatus } from 'src/common/constants/custom-http-status.constant'
 import {
   HttpResponseSuccess,
   ThrowHttpException,
 } from 'src/common/utils/http-response.util'
-import { HttpResponseStatus } from 'src/common/constants/custom-http-status.constant'
-import { I18nService } from 'nestjs-i18n'
+import { FirebaseService } from 'src/modules/firebase/firebase.service'
+import { Usuario } from 'src/modules/users/users.entity'
+import { UsersService } from 'src/modules/users/users.service'
+import { Repository } from 'typeorm'
+import { AuthShareService } from '../authShare.service'
 
 @Injectable()
 export class MethodPhoneService {
@@ -41,19 +41,19 @@ export class MethodPhoneService {
 
   async sendCodePhone({ phone }) {
     const code = await this.firebaseService.createCode({
-      data: { phone, isValidatedCode: false },
+      data: { isValidatedCode: false, phone },
       feature: 'authPhone',
     })
 
-    await this.sendCodeToPhone({ phone, code })
+    await this.sendCodeToPhone({ code, phone })
 
     return HttpResponseSuccess(this.i18n.t('phone.VERIFICATION_CODE_SENT'))
   }
 
   async validateCodePhone({ code, phone }) {
     const codeSaved = await this.firebaseService.getCodeByPhoneAndFeature({
-      phone,
       feature: 'authPhone',
+      phone,
     })
 
     const isVerify = codeSaved.code === code
@@ -70,9 +70,9 @@ export class MethodPhoneService {
     const createPayload = {
       email: user?.email,
       firstName: user?.first_name,
+      image: user?.image,
       lastName: user?.last_name,
       phone,
-      image: user?.image,
     }
 
     const isUserRegistered = user?.authMethods?.includes('phone')
@@ -98,8 +98,8 @@ export class MethodPhoneService {
 
   async registerWithPhoneGoogle({ phone, idToken }) {
     const codeSaved = await this.firebaseService.getCodeByPhoneAndFeature({
-      phone,
       feature: 'authPhone',
+      phone,
     })
 
     if (!codeSaved.isValidatedCode) {
@@ -115,7 +115,7 @@ export class MethodPhoneService {
     if (user?.authMethods?.includes('phone')) {
       ThrowHttpException(
         this.i18n.t('phone.PHONE_ALREADY_REGISTERED', {
-          args: { phone, email: payload.email },
+          args: { email: payload.email, phone },
         }),
         HttpResponseStatus.BAD_REQUEST
       )
@@ -124,17 +124,17 @@ export class MethodPhoneService {
     const methods = user?.authMethods || []
 
     await this.usersService.createOrUpdateUser({
+      existingUser: user,
       findAttribute: 'email',
       findValue: payload.email,
       userData: {
+        authMethods: [...methods, 'phone'],
         email: payload.email,
         first_name: user?.first_name || payload.given_name,
-        last_name: user?.last_name || payload.family_name,
         image: user?.image || payload.picture,
+        last_name: user?.last_name || payload.family_name,
         phone_number: phone,
-        authMethods: [...methods, 'phone'],
       },
-      existingUser: user,
     })
 
     await this.firebaseService.deleteCodeById(codeSaved.id)
@@ -142,8 +142,8 @@ export class MethodPhoneService {
     const createPayload = {
       email: payload.email,
       firstName: user?.first_name || payload.given_name,
-      lastName: user?.last_name || payload.family_name,
       image: user?.image || payload.picture,
+      lastName: user?.last_name || payload.family_name,
       phone,
     }
 
