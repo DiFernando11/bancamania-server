@@ -1,22 +1,22 @@
-import { Module } from '@nestjs/common';
-import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { AuthModule } from './auth/auth.module';
-import { UsersModule } from './users/users.module';
-import { Usuario } from './users/users.entity';
-import { WhatsappModule } from './whatsapp/whatsapp.module';
-import { FirebaseModule } from './firebase/firebase.module';
-import { CroneModule } from './crone/crone.module';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import appConfig from './config/app.config';
+import { Module } from '@nestjs/common'
+import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm'
+import { AppController } from './app.controller'
+import { AppService } from './app.service'
+import { AuthModule } from './modules/auth/auth.module'
+import { UsersModule } from './modules/users/users.module'
+import { Usuario } from './modules/users/users.entity'
+import { WhatsappModule } from './modules/whatsapp/whatsapp.module'
+import { FirebaseModule } from './modules/firebase/firebase.module'
+import { CroneModule } from './modules/crone/crone.module'
+import { ConfigModule, ConfigService } from '@nestjs/config'
+import appConfig from './config/app.config'
 import {
   AcceptLanguageResolver,
   HeaderResolver,
   I18nModule,
   QueryResolver,
-} from 'nestjs-i18n';
-import * as path from 'path';
+} from 'nestjs-i18n'
+import * as path from 'path'
 
 @Module({
   imports: [

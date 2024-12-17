@@ -19,5 +19,5 @@
     "noFallthroughCasesInSwitch": false,
   },
   "exclude": ["node_modules", "dist"],
-  "include": ["src/**/*", "src/i18n/**/*"]
+  "include": ["src/**/*", "i18n/**/*.json"]
 }
