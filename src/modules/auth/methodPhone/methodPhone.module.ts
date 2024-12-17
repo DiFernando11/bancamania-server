@@ -1,15 +1,16 @@
 import { Module } from '@nestjs/common'
-import { MethodPhoneController } from './methodPhone.controller'
-import { MethodPhoneService } from './methodPhone.service'
-import { AuthShareService } from '../authShare.service'
+import { ConfigService } from '@nestjs/config'
+import { JwtModule } from '@nestjs/jwt'
 import { TypeOrmModule } from '@nestjs/typeorm'
+import { FirebaseService } from 'src/modules/firebase/firebase.service'
 import { Usuario } from 'src/modules/users/users.entity'
 import { UsersService } from 'src/modules/users/users.service'
-import { JwtModule } from '@nestjs/jwt'
-import { FirebaseService } from 'src/modules/firebase/firebase.service'
-import { ConfigService } from '@nestjs/config'
+import { AuthShareService } from '../authShare.service'
+import { MethodPhoneController } from './methodPhone.controller'
+import { MethodPhoneService } from './methodPhone.service'
 
 @Module({
+  controllers: [MethodPhoneController],
   imports: [
     TypeOrmModule.forFeature([Usuario]),
     JwtModule.registerAsync({
@@ -22,7 +23,6 @@ import { ConfigService } from '@nestjs/config'
       }),
     }),
   ],
-  controllers: [MethodPhoneController],
   providers: [
     MethodPhoneService,
     AuthShareService,

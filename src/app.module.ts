@@ -1,15 +1,6 @@
 import { Module } from '@nestjs/common'
-import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm'
-import { AppController } from './app.controller'
-import { AppService } from './app.service'
-import { AuthModule } from './modules/auth/auth.module'
-import { UsersModule } from './modules/users/users.module'
-import { Usuario } from './modules/users/users.entity'
-import { WhatsappModule } from './modules/whatsapp/whatsapp.module'
-import { FirebaseModule } from './modules/firebase/firebase.module'
-import { CroneModule } from './modules/crone/crone.module'
 import { ConfigModule, ConfigService } from '@nestjs/config'
-import appConfig from './config/app.config'
+import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm'
 import {
   AcceptLanguageResolver,
   HeaderResolver,
@@ -17,13 +8,23 @@ import {
   QueryResolver,
 } from 'nestjs-i18n'
 import * as path from 'path'
+import { AppController } from './app.controller'
+import { AppService } from './app.service'
+import appConfig from './config/app.config'
+import { AuthModule } from './modules/auth/auth.module'
+import { CroneModule } from './modules/crone/crone.module'
+import { FirebaseModule } from './modules/firebase/firebase.module'
+import { Usuario } from './modules/users/users.entity'
+import { UsersModule } from './modules/users/users.module'
+import { WhatsappModule } from './modules/whatsapp/whatsapp.module'
 
 @Module({
+  controllers: [AppController],
   imports: [
     ConfigModule.forRoot({
+      envFilePath: [`.env.${process.env.NODE_ENV}`],
       isGlobal: true,
       load: [appConfig],
-      envFilePath: [`.env.${process.env.NODE_ENV}`],
     }),
     AuthModule,
     UsersModule,
@@ -34,15 +35,15 @@ import * as path from 'path'
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService): TypeOrmModuleOptions => ({
-        type: 'postgres',
-        host: configService.get<string>('database.host'),
-        port: configService.get<number>('database.port'),
-        username: configService.get<string>('database.username'),
-        password: configService.get<string>('database.password'),
+        autoLoadEntities: true,
         database: configService.get<string>('database.name'),
         entities: [Usuario],
+        host: configService.get<string>('database.host'),
+        password: configService.get<string>('database.password'),
+        port: configService.get<number>('database.port'),
         synchronize: configService.get<boolean>('database.synchronize'),
-        autoLoadEntities: true,
+        type: 'postgres',
+        username: configService.get<string>('database.username'),
       }),
     }),
     I18nModule.forRoot({
@@ -52,13 +53,12 @@ import * as path from 'path'
         watch: true,
       },
       resolvers: [
-        { use: QueryResolver, options: ['lang'] },
+        { options: ['lang'], use: QueryResolver },
         AcceptLanguageResolver,
         new HeaderResolver(['x-lang']),
       ],
     }),
   ],
-  controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {}

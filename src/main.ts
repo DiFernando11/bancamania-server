@@ -1,11 +1,11 @@
 import { ValidationPipe } from '@nestjs/common'
-import * as cookieParser from 'cookie-parser'
-import { NestFactory } from '@nestjs/core'
-import { AppModule } from './app.module'
 import { ConfigService } from '@nestjs/config'
-import { ThrowHttpException } from './common/utils'
-import { HttpResponseStatus } from './common/constants'
+import { NestFactory } from '@nestjs/core'
+import * as cookieParser from 'cookie-parser'
 import { I18nService } from 'nestjs-i18n'
+import { AppModule } from './app.module'
+import { HttpResponseStatus } from './common/constants'
+import { ThrowHttpException } from './common/utils'
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
@@ -13,15 +13,12 @@ async function bootstrap() {
   const i18n: I18nService = app.get(I18nService)
   app.useGlobalPipes(
     new ValidationPipe({
-      transform: true,
-      whitelist: true,
-      forbidNonWhitelisted: true,
       exceptionFactory: (errors) => {
         const formattedErrors = errors.map((error) => ({
-          field: error.property,
           errors: Object.values(error.constraints).map((message) =>
             String(i18n.t(`validationDto.${message}`))
           ),
+          field: error.property,
         }))
         ThrowHttpException(
           String(i18n.t('validationDto.VALIDATION_FAILED')),
@@ -29,15 +26,18 @@ async function bootstrap() {
           formattedErrors
         )
       },
+      forbidNonWhitelisted: true,
+      transform: true,
+      whitelist: true,
     })
   )
 
   app.use(cookieParser())
 
   app.enableCors({
-    origin: 'http://localhost:3000',
-    methods: 'GET,POST,PUT,DELETE',
     credentials: true,
+    methods: 'GET,POST,PUT,DELETE',
+    origin: 'http://localhost:3000',
   })
   const port = configService.get<number>('app.port')
 

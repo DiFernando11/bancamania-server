@@ -1,20 +1,21 @@
 import { Module } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import { JwtModule } from '@nestjs/jwt'
-import { AuthController } from './auth.controller'
-import { JwtStrategy } from '../../strategies/jwt.strategy'
 import { TypeOrmModule } from '@nestjs/typeorm'
-import { Usuario } from 'src/modules/users/users.entity'
-import { UsersService } from 'src/modules/users/users.service'
+import { TwilioModule } from 'nestjs-twilio'
 import { MailService } from 'src/modules/mail/mail.service'
 import { SmsService } from 'src/modules/sms/sms.service'
-import { TwilioModule } from 'nestjs-twilio'
+import { Usuario } from 'src/modules/users/users.entity'
+import { UsersService } from 'src/modules/users/users.service'
 import { WhatsappService } from 'src/modules/whatsapp/whatsapp.service'
-import { MethodPhoneModule } from './methodPhone/methodPhone.module'
-import { MethodGoogleModule } from './methodGoogle/methodGoogle.module'
+import { JwtStrategy } from '../../strategies/jwt.strategy'
+import { AuthController } from './auth.controller'
 import { MethodCredentialsModule } from './methodCredentials/methodCredentials.module'
-import { ConfigService } from '@nestjs/config'
+import { MethodGoogleModule } from './methodGoogle/methodGoogle.module'
+import { MethodPhoneModule } from './methodPhone/methodPhone.module'
 
 @Module({
+  controllers: [AuthController],
   imports: [
     JwtModule.registerAsync({
       inject: [ConfigService],
@@ -44,6 +45,5 @@ import { ConfigService } from '@nestjs/config'
     SmsService,
     WhatsappService,
   ],
-  controllers: [AuthController],
 })
 export class AuthModule {}

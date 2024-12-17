@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common'
-import { UsersService } from 'src/modules/users/users.service'
-import { AuthShareService } from '../authShare.service'
 import * as bcrypt from 'bcryptjs'
-import { MailService } from 'src/modules/mail/mail.service'
-import { CreateUserCredentialsDto } from './dto/register.dto'
-import { FirebaseService } from 'src/modules/firebase/firebase.service'
+import { I18nService } from 'nestjs-i18n'
 import { HttpResponseStatus } from 'src/common/constants'
 import { HttpResponseSuccess, ThrowHttpException } from 'src/common/utils'
-import { I18nService } from 'nestjs-i18n'
+import { FirebaseService } from 'src/modules/firebase/firebase.service'
+import { MailService } from 'src/modules/mail/mail.service'
+import { UsersService } from 'src/modules/users/users.service'
+import { AuthShareService } from '../authShare.service'
+import { CreateUserCredentialsDto } from './dto/register.dto'
 
 @Injectable()
 export class MethodCredentialsService {
@@ -35,8 +35,8 @@ export class MethodCredentialsService {
     })
 
     await this.mailService.sendToCodeMail({
-      email,
       code,
+      email,
     })
 
     return HttpResponseSuccess(
@@ -76,23 +76,23 @@ export class MethodCredentialsService {
     const methods = user?.authMethods || []
 
     await this.usersService.createOrUpdateUser({
+      existingUser: user,
       findAttribute: 'email',
       findValue: email,
       userData: {
+        authMethods: [...methods, 'credentials'],
         email,
         first_name: firstName,
         last_name: lastName,
         password: hashedPassword,
-        authMethods: [...methods, 'credentials'],
       },
-      existingUser: user,
     })
 
     const createPayload = {
       email,
       firstName: firstName || user?.first_name,
-      lastName: lastName || user?.last_name,
       image: user?.image,
+      lastName: lastName || user?.last_name,
       phone: user?.phone_number,
     }
 
@@ -100,8 +100,8 @@ export class MethodCredentialsService {
       this.i18n.t('auth.REGISTRATION_SUCCESS'),
       {
         token: this.authShareService.createToken({
-          user: createPayload,
           expiresIn: '5m',
+          user: createPayload,
         }),
         user: createPayload,
       },
@@ -131,8 +131,8 @@ export class MethodCredentialsService {
     const createPayload = {
       email: user.email,
       firstName: user.first_name,
-      lastName: user.last_name,
       image: user.image,
+      lastName: user.last_name,
       phone: user.phone_number,
     }
 

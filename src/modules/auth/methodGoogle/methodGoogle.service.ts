@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common'
-import { AuthShareService } from '../authShare.service'
-import { UsersService } from 'src/modules/users/users.service'
+import { I18nService } from 'nestjs-i18n'
+import { HttpResponseStatus } from 'src/common/constants/custom-http-status.constant'
 import {
   HttpResponseSuccess,
   ThrowHttpException,
 } from 'src/common/utils/http-response.util'
-import { HttpResponseStatus } from 'src/common/constants/custom-http-status.constant'
-import { I18nService } from 'nestjs-i18n'
+import { UsersService } from 'src/modules/users/users.service'
+import { AuthShareService } from '../authShare.service'
 
 @Injectable()
 export class MethodGoogleService {
@@ -31,25 +31,25 @@ export class MethodGoogleService {
 
     if (!userFind?.authMethods?.includes('google')) {
       await this.usersService.createOrUpdateUser({
+        existingUser: userFind,
         findAttribute: 'email',
         findValue: payload.email,
         userData: {
+          authMethods: [...methods, 'google'],
           email: payload.email,
           first_name: userFind?.first_name || payload.given_name,
-          last_name: userFind?.last_name || payload.family_name,
           image: userFind?.image || payload.picture,
-          authMethods: [...methods, 'google'],
+          last_name: userFind?.last_name || payload.family_name,
         },
-        existingUser: userFind,
       })
     }
 
     const createPayload = {
       email: payload.email,
       firstName: userFind?.first_name || payload.given_name,
+      image: userFind?.image || payload.picture,
       lastName: userFind?.last_name || payload.family_name,
       phone: userFind?.phone_number,
-      image: userFind?.image || payload.picture,
     }
 
     return HttpResponseSuccess(this.i18n.t('auth.GOOGLE_AUTH_SUCCESS'), {

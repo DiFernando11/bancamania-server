@@ -22,6 +22,6 @@ export class AppService {
       `DB Host: ${dbHost}, DB Port: ${dbPort}, DB Name: ${dbName}`
     )
 
-    return { dbHost, dbPort, dbUser, dbName }
+    return { dbHost, dbName, dbPort, dbUser }
   }
 }

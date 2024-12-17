@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, Unique } from 'typeorm'
+import { Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm'
 
 @Entity()
 @Unique(['email', 'phone_number']) // Hacemos que el teléfono también sea único
@@ -9,7 +9,7 @@ export class Usuario {
   @Column({ nullable: true, unique: true })
   email: string
 
-  @Column({ type: 'simple-array', nullable: true, default: '' })
+  @Column({ default: '', nullable: true, type: 'simple-array' })
   authMethods: string[]
 
   @Column({ nullable: true })
@@ -27,16 +27,16 @@ export class Usuario {
   @Column({ nullable: true })
   address: string
 
-  @Column({ type: 'boolean', default: false })
+  @Column({ default: false, type: 'boolean' })
   isVerify: boolean
 
-  @Column({ type: 'boolean', default: false })
+  @Column({ default: false, type: 'boolean' })
   isVerifyPhone: boolean
 
-  @Column({ nullable: true, length: 6 })
+  @Column({ length: 6, nullable: true })
   verificationCode: string
 
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ nullable: true, type: 'timestamp' })
   verificationExpiresAt: Date
 
   @Column({ nullable: true, unique: true })

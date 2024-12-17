@@ -26,13 +26,13 @@ export class UsersService {
 
   async createUser(user: Partial<Usuario>) {
     const newUser = this.usuarioRepository.create({
+      authMethods: user.authMethods,
       email: user.email,
       first_name: user.first_name,
-      last_name: user.last_name,
       image: user.image,
-      phone_number: user.phone_number,
+      last_name: user.last_name,
       password: user.password,
-      authMethods: user.authMethods,
+      phone_number: user.phone_number,
     })
 
     return await this.usuarioRepository.save(newUser)

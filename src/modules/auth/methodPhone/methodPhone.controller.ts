@@ -1,11 +1,11 @@
-import { Controller, Post, Body, HttpCode } from '@nestjs/common'
-import { MethodPhoneService } from './methodPhone.service'
+import { Body, Controller, HttpCode, Post } from '@nestjs/common'
 import {
   RegisterPhone,
   RegisterPhoneDto,
   // TokenDto,
   ValidatePhoneRegister,
 } from '../dto/register.dto'
+import { MethodPhoneService } from './methodPhone.service'
 
 @Controller('auth/phone')
 export class MethodPhoneController {
@@ -24,8 +24,8 @@ export class MethodPhoneController {
     @Body() validatePhoneRegister: ValidatePhoneRegister
   ) {
     return this.methodPhoneService.validateCodePhone({
-      phone: validatePhoneRegister.phone,
       code: validatePhoneRegister.code,
+      phone: validatePhoneRegister.phone,
     })
   }
 

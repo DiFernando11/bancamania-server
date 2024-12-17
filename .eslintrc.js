@@ -6,25 +6,23 @@ module.exports = {
     project: './tsconfig.json',
     extraFileExtensions: ['.json'],
   },
-  ignorePatterns: ['**/*.json'],
   plugins: [
-    '@typescript-eslint/eslint-plugin',
     '@typescript-eslint',
     'prettier',
-    'json',
+    'simple-import-sort',
+    'sort-keys-fix',
   ],
   extends: [
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
     'plugin:prettier/recommended',
-    'plugin:json/recommended-legacy',
   ],
   root: true,
   env: {
     node: true,
     jest: true,
   },
-  ignorePatterns: ['.eslintrc.js'],
+  ignorePatterns: ['.eslintrc.js', '**/*.json'],
   rules: {
     '@typescript-eslint/interface-name-prefix': 'off',
     '@typescript-eslint/explicit-function-return-type': 'off',
@@ -32,13 +30,21 @@ module.exports = {
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
     'prettier/prettier': 'error',
-    'no-console': 'warn',
-    'no-debugger': 'warn',
     'no-console': [
       'warn',
       {
         allow: ['warn', 'error'],
       },
     ],
+    'no-debugger': 'warn',
+    'simple-import-sort/imports': [
+      'error',
+      {
+        groups: [['^\\u0000', '^@?\\w', '^', '^\\.']],
+      },
+    ],
+    'simple-import-sort/exports': 'error',
+    'sort-keys-fix/sort-keys-fix': 'error',
+    'max-len': ['error', { code: 100, ignoreComments: true }],
   },
 }

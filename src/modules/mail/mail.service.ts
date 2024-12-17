@@ -8,13 +8,13 @@ export class MailService {
 
   constructor(private readonly configService: ConfigService) {
     this.transporter = nodemailer.createTransport({
+      auth: {
+        pass: this.configService.get<string>('sendEmail.passAuth'),
+        user: this.configService.get<string>('sendEmail.userAuth'),
+      },
       host: this.configService.get<string>('sendEmail.host'),
       port: this.configService.get<number>('sendEmail.port'),
       secure: this.configService.get<boolean>('sendEmail.secure'),
-      auth: {
-        user: this.configService.get<string>('sendEmail.userAuth'),
-        pass: this.configService.get<string>('sendEmail.passAuth'),
-      },
     })
   }
 
@@ -31,19 +31,19 @@ export class MailService {
   }) {
     await this.transporter.sendMail({
       from: `"Diego Apolo 👻" <${this.configService.get<string>('sendEmail.userAuth')}>`,
-      to: email,
+      html,
       subject,
       text,
-      html,
+      to: email,
     })
   }
 
   async sendToCodeMail({ email, code }) {
     return await this.sendMail({
       email,
+      html: `Tu código de verificación es: <b><span style="font-size: 24px;">${code}</span></b>`,
       subject: 'Verifica tu codigo',
       text: `Tu codigo de verificacion es: ${code}`,
-      html: `Tu código de verificación es: <b><span style="font-size: 24px;">${code}</span></b>`,
     })
   }
 }

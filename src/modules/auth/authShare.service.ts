@@ -47,8 +47,8 @@ export class AuthShareService {
   async verifyGoogleToken(idToken) {
     try {
       const ticket = await this.client.verifyIdToken({
-        idToken,
         audience: this.configService.get<string>('googleAuth.clientId'),
+        idToken,
       })
 
       const payload = ticket.getPayload()
@@ -82,10 +82,10 @@ export class AuthShareService {
       {
         email: user.email,
         firstName: user?.first_name || user?.firstName,
-        lastName: user?.last_name || user?.lastName,
         image: user?.image,
-        phone: user?.phone || user?.phone_number,
         isVerifyPhone: true,
+        lastName: user?.last_name || user?.lastName,
+        phone: user?.phone || user?.phone_number,
       },
       {
         expiresIn,

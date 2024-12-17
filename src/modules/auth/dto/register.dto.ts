@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, MinLength, Matches } from 'class-validator'
+import { IsEmail, IsNotEmpty, Matches, MinLength } from 'class-validator'
 
 export class EmailDto {
   @IsEmail({}, { message: 'EMAIL_INVALID' })
