@@ -12,7 +12,14 @@
     "start:dev": "cross-env NODE_ENV=local nest start --watch",
     "start:prod": "cross-env NODE_ENV=prod node dist/main",
     "start:debug": "nest start --debug --watch",
-    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix"
+    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "**/*.{js,ts,tsx}": [
+      "eslint --fix --max-warnings=0",
+      "prettier --write"
+    ]
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
@@ -60,7 +67,9 @@
     "eslint-plugin-prettier": "^5.2.1",
     "eslint-plugin-simple-import-sort": "^12.1.1",
     "eslint-plugin-sort-keys-fix": "^1.1.2",
+    "husky": "^9.1.7",
     "jest": "^29.5.0",
+    "lint-staged": "^15.2.11",
     "prettier": "^3.4.2",
     "prettier-plugin-sort-json": "^4.0.0",
     "source-map-support": "^0.5.21",
