@@ -47,4 +47,11 @@ module.exports = {
     'sort-keys-fix/sort-keys-fix': 'error',
     'max-len': ['error', { code: 100, ignoreComments: true }],
   },
+  settings: {
+    'import/resolver': {
+      typescript: {
+        project: './tsconfig.json',
+      },
+    },
+  },
 }

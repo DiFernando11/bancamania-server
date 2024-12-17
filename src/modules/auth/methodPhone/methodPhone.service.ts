@@ -1,32 +1,35 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { I18nService } from 'nestjs-i18n'
-import { HttpResponseStatus } from 'src/common/constants/custom-http-status.constant'
+import { HttpResponseStatus } from '@/src/common/constants'
+import { PromiseApiResponse } from '@/src/common/types'
+import { PromiseApiAuthResponse } from '@/src/common/types/apiResponse'
+import { HttpResponseSuccess, ThrowHttpException } from '@/src/common/utils'
+import { AuthShareService } from '@/src/modules/auth/authShare.service'
 import {
-  HttpResponseSuccess,
-  ThrowHttpException,
-} from 'src/common/utils/http-response.util'
-import { FirebaseService } from 'src/modules/firebase/firebase.service'
-import { Usuario } from 'src/modules/users/users.entity'
-import { UsersService } from 'src/modules/users/users.service'
-import { Repository } from 'typeorm'
-import { AuthShareService } from '../authShare.service'
+  Phone,
+  RegisterWithPhoneGoogle,
+  SendCodeToPhone,
+  ValidateCode,
+} from '@/src/modules/auth/methodPhone/types'
+import { FirebaseService } from '@/src/modules/firebase/firebase.service'
+import { Usuario } from '@/src/modules/users/users.entity'
+import { UsersService } from '@/src/modules/users/users.service'
 
 @Injectable()
 export class MethodPhoneService {
   constructor(
     @InjectRepository(Usuario)
-    private readonly usuarioRepository: Repository<Usuario>,
     private readonly authShareService: AuthShareService,
     private readonly usersService: UsersService,
     private readonly firebaseService: FirebaseService,
     private readonly i18n: I18nService
   ) {}
 
-  async sendCodeToPhone({ phone, code }) {
+  async sendCodeToPhone({ phone, code }: SendCodeToPhone) {
     try {
       /* eslint-disable no-console */
-      console.log(phone, code.verificationCode, 'SEND WHATSAPP')
+      console.log(phone, code, 'SEND WHATSAPP')
 
       return code
     } catch (error) {
@@ -39,7 +42,7 @@ export class MethodPhoneService {
     }
   }
 
-  async sendCodePhone({ phone }) {
+  async sendCodePhone({ phone }: Phone): PromiseApiResponse<null> {
     const code = await this.firebaseService.createCode({
       data: { isValidatedCode: false, phone },
       feature: 'authPhone',
@@ -50,7 +53,10 @@ export class MethodPhoneService {
     return HttpResponseSuccess(this.i18n.t('phone.VERIFICATION_CODE_SENT'))
   }
 
-  async validateCodePhone({ code, phone }) {
+  async validateCodePhone({
+    code,
+    phone,
+  }: SendCodeToPhone): PromiseApiResponse<ValidateCode> {
     const codeSaved = await this.firebaseService.getCodeByPhoneAndFeature({
       feature: 'authPhone',
       phone,
@@ -96,7 +102,10 @@ export class MethodPhoneService {
     })
   }
 
-  async registerWithPhoneGoogle({ phone, idToken }) {
+  async registerWithPhoneGoogle({
+    phone,
+    idToken,
+  }: RegisterWithPhoneGoogle): PromiseApiAuthResponse {
     const codeSaved = await this.firebaseService.getCodeByPhoneAndFeature({
       feature: 'authPhone',
       phone,

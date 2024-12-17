@@ -1,13 +1,20 @@
 import { Injectable } from '@nestjs/common'
 import * as bcrypt from 'bcryptjs'
 import { I18nService } from 'nestjs-i18n'
-import { HttpResponseStatus } from 'src/common/constants'
-import { HttpResponseSuccess, ThrowHttpException } from 'src/common/utils'
-import { FirebaseService } from 'src/modules/firebase/firebase.service'
-import { MailService } from 'src/modules/mail/mail.service'
-import { UsersService } from 'src/modules/users/users.service'
-import { AuthShareService } from '../authShare.service'
-import { CreateUserCredentialsDto } from './dto/register.dto'
+import { HttpResponseStatus } from '@/src/common/constants'
+import { PromiseApiResponse } from '@/src/common/types'
+import { PromiseApiAuthResponse } from '@/src/common/types/apiResponse'
+import { HttpResponseSuccess, ThrowHttpException } from '@/src/common/utils'
+import { AuthShareService } from '@/src/modules/auth/authShare.service'
+import {
+  Email,
+  LoginCredentials,
+  RegisterCredentials,
+  SendCodeRegister,
+} from '@/src/modules/auth/methodCredentials/types'
+import { FirebaseService } from '@/src/modules/firebase/firebase.service'
+import { MailService } from '@/src/modules/mail/mail.service'
+import { UsersService } from '@/src/modules/users/users.service'
 
 @Injectable()
 export class MethodCredentialsService {
@@ -19,7 +26,9 @@ export class MethodCredentialsService {
     private readonly i18n: I18nService
   ) {}
 
-  async sendCodeRegisterCredentials({ email }: { email: string }) {
+  async sendCodeRegisterCredentials({
+    email,
+  }: Email): PromiseApiResponse<SendCodeRegister> {
     const user = await this.usersService.findByEmail(email)
 
     if (user && user?.authMethods?.includes('credentials')) {
@@ -54,7 +63,7 @@ export class MethodCredentialsService {
     firstName,
     lastName,
     code,
-  }: CreateUserCredentialsDto) {
+  }: RegisterCredentials): PromiseApiAuthResponse {
     const codeSaved = await this.firebaseService.getCodeByEmailAndFeature({
       email,
       feature: 'registerCredentials',
@@ -109,7 +118,10 @@ export class MethodCredentialsService {
     )
   }
 
-  async loginWithCredentials(email: string, password: string) {
+  async loginWithCredentials({
+    email,
+    password,
+  }: LoginCredentials): PromiseApiAuthResponse {
     const user = await this.usersService.findByEmail(email)
 
     if (!user) {

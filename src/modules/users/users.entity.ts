@@ -27,18 +27,6 @@ export class Usuario {
   @Column({ nullable: true })
   address: string
 
-  @Column({ default: false, type: 'boolean' })
-  isVerify: boolean
-
-  @Column({ default: false, type: 'boolean' })
-  isVerifyPhone: boolean
-
-  @Column({ length: 6, nullable: true })
-  verificationCode: string
-
-  @Column({ nullable: true, type: 'timestamp' })
-  verificationExpiresAt: Date
-
   @Column({ nullable: true, unique: true })
   phone_number: string
 }
