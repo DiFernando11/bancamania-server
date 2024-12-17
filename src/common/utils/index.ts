@@ -2,4 +2,4 @@ export {
   HttpResponseError,
   HttpResponseSuccess,
   ThrowHttpException,
-} from './http-response.util';
+} from './http-response.util'

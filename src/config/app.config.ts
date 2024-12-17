@@ -43,4 +43,4 @@ export default () => ({
     userAuth: process.env.MAIL_USER,
     passAuth: process.env.MAIL_PASS,
   },
-});
+})

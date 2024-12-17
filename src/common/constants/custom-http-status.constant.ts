@@ -1,4 +1,4 @@
-import { HttpStatus } from '@nestjs/common';
+import { HttpStatus } from '@nestjs/common'
 
 export const HttpResponseStatus = {
   // Respuestas exitosas
@@ -21,4 +21,4 @@ export const HttpResponseStatus = {
     code: HttpStatus.INTERNAL_SERVER_ERROR,
     message: 'Internal Server Error',
   }, // 500
-};
+}
