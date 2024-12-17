@@ -1,0 +1,20 @@
+{
+  "PASSWORD_LOWERCASE": "The password must contain at least one lowercase letter.",
+  "PASSWORD_UPPERCASE": "The password must contain at least one uppercase letter.",
+  "PASSWORD_NUMBER": "The password must contain at least one number.",
+  "PASSWORD_SPECIAL_CHAR": "The password must contain at least one special character (@, $, !, %, *, ?, &).",
+  "PHONE_REQUIRED": "The phone number is required.",
+  "EMAIL_REQUIRED": "The email is required.",
+  "EMAIL_INVALID": "The email format is incorrect (e.g., user@domain.com).",
+  "PASSWORD_REQUIRED": "The password is required.",
+  "PASSWORD_STRING": "The password must be a string.",
+  "PASSWORD_MIN_LENGTH": "The password must be between 8 and 20 characters.",
+  "FIRSTNAME_REQUIRED": "The first name is required.",
+  "FIRSTNAME_STRING": "The first name must be a string.",
+  "LASTNAME_REQUIRED": "The last name is required.",
+  "LASTNAME_STRING": "The last name must be a string.",
+  "CODE_REQUIRED": "The verification code is required.",
+  "CODE_LENGTH": "The verification code must be exactly 6 characters long.",
+  "TOKEN_REQUIRED": "The token is required.",
+  "VALIDATION_FAILED": "Validation errors detected."
+}

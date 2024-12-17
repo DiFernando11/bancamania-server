@@ -6,6 +6,7 @@ export const HttpResponseSuccess = (
   data?: any,
   status = HttpResponseStatus.OK,
 ) => ({
+  ok: true,
   statusCode: status.code,
   message: message || status.message,
   data: data || null,
@@ -13,15 +14,21 @@ export const HttpResponseSuccess = (
 export const HttpResponseError = (
   message: string,
   status = HttpResponseStatus.BAD_REQUEST,
+  error?: any,
 ) => ({
+  ok: false,
   statusCode: status.code,
   message: message || status.message,
-  error: status.message,
+  error,
 });
 
 export const ThrowHttpException = (
   message: string,
   status = HttpResponseStatus.BAD_REQUEST,
+  error?: any,
 ) => {
-  throw new HttpException(HttpResponseError(message, status), status.code);
+  throw new HttpException(
+    HttpResponseError(message, status, error),
+    status.code,
+  );
 };

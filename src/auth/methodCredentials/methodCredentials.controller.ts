@@ -1,4 +1,4 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode } from '@nestjs/common';
 import { MethodCredentialsService } from './methodCredentials.service';
 import { CreateUserCredentialsDto, LoginDto } from './dto/register.dto';
 import { EmailDto } from '../dto/register.dto';
@@ -10,6 +10,7 @@ export class MethodCredentialsController {
   ) {}
 
   @Post('sendCode')
+  @HttpCode(200)
   async sendCodeRegisterCredentials(@Body() createUserDto: EmailDto) {
     return await this.methodCredentialsService.sendCodeRegisterCredentials({
       email: createUserDto.email,
@@ -30,6 +31,7 @@ export class MethodCredentialsController {
   }
 
   @Post('login')
+  @HttpCode(200)
   async loginWithCredentials(@Body() loginDto: LoginDto) {
     return await this.methodCredentialsService.loginWithCredentials(
       loginDto.email,

@@ -1,69 +1,63 @@
-// src/auth/dto/register.dto.ts
 import { IsEmail, IsNotEmpty, MinLength, Matches } from 'class-validator';
 
 export class EmailDto {
-  @IsEmail({}, { message: 'El correo electrónico no es válido' })
-  @IsNotEmpty({ message: 'El correo electrónico es obligatorio' })
+  @IsEmail({}, { message: 'EMAIL_INVALID' })
+  @IsNotEmpty({ message: 'EMAIL_REQUIRED' })
   email: string;
 }
 
 export class RegisterDto {
-  @IsEmail({}, { message: 'El correo electrónico no es válido' })
-  @IsNotEmpty({ message: 'El correo electrónico es obligatorio' })
+  @IsEmail({}, { message: 'EMAIL_INVALID' })
+  @IsNotEmpty({ message: 'EMAIL_REQUIRED' })
   email: string;
 
-  @IsNotEmpty({ message: 'La contraseña es obligatoria' })
-  @MinLength(8, { message: 'La contraseña debe tener al menos 8 caracteres' })
-  @Matches(/(?=.*[a-z])/, {
-    message: 'La contraseña debe contener al menos una letra minúscula',
-  })
-  @Matches(/(?=.*[A-Z])/, {
-    message: 'La contraseña debe contener al menos una letra mayúscula',
-  })
-  @Matches(/(?=.*\d)/, {
-    message: 'La contraseña debe contener al menos un número',
-  })
-  @Matches(/(?=.*[@$!%*?&])/, {
-    message:
-      'La contraseña debe contener al menos un carácter especial (@, $, !, %, *, ?, &)',
-  })
+  @IsNotEmpty({ message: 'PASSWORD_REQUIRED' })
+  @MinLength(8, { message: 'PASSWORD_MIN_LENGTH' })
+  @Matches(/(?=.*[a-z])/, { message: 'PASSWORD_LOWERCASE' })
+  @Matches(/(?=.*[A-Z])/, { message: 'PASSWORD_UPPERCASE' })
+  @Matches(/(?=.*\d)/, { message: 'PASSWORD_NUMBER' })
+  @Matches(/(?=.*[@$!%*?&])/, { message: 'PASSWORD_SPECIAL_CHAR' })
   password: string;
 }
 
 export class RegisterVerifyCodeDto {
-  @IsNotEmpty({ message: 'El correo electrónico es obligatorio' })
+  @IsNotEmpty({ message: 'EMAIL_REQUIRED' })
   email: string;
 
-  @IsNotEmpty({ message: 'El codigo de verificacion es obligatorio' })
+  @IsNotEmpty({ message: 'CODE_REQUIRED' })
   code: string;
 }
 
 export class RegisterPhoneDto {
-  @IsNotEmpty({ message: 'El numero de celular es obligatorio' })
+  @IsNotEmpty({ message: 'PHONE_REQUIRED' })
   phone: string;
 }
+
 export class RegisterPhone {
-  @IsNotEmpty({ message: 'El numero de telefono es obligatorio' })
+  @IsNotEmpty({ message: 'PHONE_REQUIRED' })
   phone: string;
-  @IsNotEmpty({ message: 'El token es obligatorio' })
+
+  @IsNotEmpty({ message: 'TOKEN_REQUIRED' })
   idToken: string;
 }
 
 export class TokenDto {
-  @IsNotEmpty({ message: 'El token es obligatorio' })
+  @IsNotEmpty({ message: 'TOKEN_REQUIRED' })
   idToken: string;
 }
 
 export class ValidatePhoneRegister {
-  @IsNotEmpty({ message: 'El numero de celular es obligatorio' })
+  @IsNotEmpty({ message: 'PHONE_REQUIRED' })
   phone: string;
-  @IsNotEmpty({ message: 'El codigo es obligatorio' })
+
+  @IsNotEmpty({ message: 'CODE_REQUIRED' })
   code: string;
 }
 
 export class CodeToEmailByPhoneDto {
-  @IsNotEmpty({ message: 'El numero de celular es obligatorio' })
+  @IsNotEmpty({ message: 'PHONE_REQUIRED' })
   phone: string;
-  @IsNotEmpty({ message: 'El correo electrónico es obligatorio' })
+
+  @IsNotEmpty({ message: 'EMAIL_REQUIRED' })
   email: string;
 }
