@@ -1,5 +1,5 @@
 {
-  "MIN_LENGTH": "The field {{field}} must be at least {{length}} characters.",
-  "REQUIRED_FIELD": "The field {{field}} is required.",
+  "MIN_LENGTH": "The field {field} must be at least {length} characters.",
+  "REQUIRED_FIELD": "The field {field} is required.",
   "VALIDATION_FAILED": "Validation errors detected."
 }

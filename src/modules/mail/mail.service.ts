@@ -14,7 +14,6 @@ export class MailService {
       },
       host: this.configService.get<string>('sendEmail.host'),
       port: this.configService.get<number>('sendEmail.port'),
-      secure: this.configService.get<boolean>('sendEmail.secure'),
     })
   }
 
