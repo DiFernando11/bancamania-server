@@ -31,7 +31,6 @@ export default () => ({
     host: process.env.MAIL_HOST,
     passAuth: process.env.MAIL_PASS,
     port: process.env.MAIL_PORT || 587,
-    secure: process.env.MAIL_SECURE || false,
     userAuth: process.env.MAIL_USER,
   },
   twilio: {

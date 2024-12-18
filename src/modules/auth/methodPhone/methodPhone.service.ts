@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { I18nService } from 'nestjs-i18n'
+import { Repository } from 'typeorm'
 import { HttpResponseStatus } from '@/src/common/constants'
 import { PromiseApiResponse } from '@/src/common/types'
 import { PromiseApiAuthResponse } from '@/src/common/types/apiResponse'
@@ -20,6 +21,7 @@ import { UsersService } from '@/src/modules/users/users.service'
 export class MethodPhoneService {
   constructor(
     @InjectRepository(Usuario)
+    private readonly usuarioRepository: Repository<Usuario>,
     private readonly authShareService: AuthShareService,
     private readonly usersService: UsersService,
     private readonly firebaseService: FirebaseService,
@@ -36,7 +38,7 @@ export class MethodPhoneService {
       console.error(error, 'ERROR ENVIANDO CODIGO')
 
       ThrowHttpException(
-        this.i18n.t('phone.SEND_CODE_ERROR'),
+        this.i18n.t('auth.SEND_CODE_ERROR'),
         HttpResponseStatus.BAD_REQUEST
       )
     }
@@ -50,7 +52,7 @@ export class MethodPhoneService {
 
     await this.sendCodeToPhone({ code, phone })
 
-    return HttpResponseSuccess(this.i18n.t('phone.VERIFICATION_CODE_SENT'))
+    return HttpResponseSuccess(this.i18n.t('auth.VERIFICATION_CODE_SENT'))
   }
 
   async validateCodePhone({
@@ -66,7 +68,7 @@ export class MethodPhoneService {
 
     if (!isVerify) {
       ThrowHttpException(
-        this.i18n.t('phone.INVALID_VERIFICATION_CODE'),
+        this.i18n.t('auth.INVALID_VERIFICATION_CODE'),
         HttpResponseStatus.BAD_REQUEST
       )
     }
@@ -86,7 +88,7 @@ export class MethodPhoneService {
     if (isUserRegistered) {
       await this.firebaseService.deleteCodeById(codeSaved.id)
 
-      return HttpResponseSuccess(this.i18n.t('phone.LOGIN_SUCCESS'), {
+      return HttpResponseSuccess(this.i18n.t('auth.LOGIN_SUCCESS'), {
         isUserRegistered,
         token: this.authShareService.createToken({ user: createPayload }),
         user: createPayload,
@@ -97,7 +99,7 @@ export class MethodPhoneService {
       isValidatedCode: true,
     })
 
-    return HttpResponseSuccess(this.i18n.t('phone.LINK_PHONE_EMAIL'), {
+    return HttpResponseSuccess(this.i18n.t('auth.LINK_PHONE_EMAIL'), {
       isUserRegistered,
     })
   }
@@ -113,7 +115,7 @@ export class MethodPhoneService {
 
     if (!codeSaved.isValidatedCode) {
       ThrowHttpException(
-        this.i18n.t('phone.PHONE_NOT_VERIFIED'),
+        this.i18n.t('auth.PHONE_NOT_VERIFIED'),
         HttpResponseStatus.BAD_REQUEST
       )
     }
@@ -123,7 +125,7 @@ export class MethodPhoneService {
 
     if (user?.authMethods?.includes('phone')) {
       ThrowHttpException(
-        this.i18n.t('phone.PHONE_ALREADY_REGISTERED', {
+        this.i18n.t('auth.PHONE_ALREADY_REGISTERED', {
           args: { email: payload.email, phone },
         }),
         HttpResponseStatus.BAD_REQUEST
@@ -157,7 +159,7 @@ export class MethodPhoneService {
     }
 
     return HttpResponseSuccess(
-      this.i18n.t('phone.REGISTRATION_SUCCESS'),
+      this.i18n.t('auth.REGISTRATION_SUCCESS'),
       {
         token: this.authShareService.createToken({ user: createPayload }),
         user: createPayload,
