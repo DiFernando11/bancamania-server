@@ -15,6 +15,7 @@
   "PASSWORD_STRING": "The password must be a string.",
   "PASSWORD_UPPERCASE": "The password must contain at least one uppercase letter.",
   "PHONE_REQUIRED": "The phone number is required.",
+  "REFRESH_TOKEN_REQUIRED": "The refresh token is required.",
   "TOKEN_REQUIRED": "The token is required.",
   "VALIDATION_FAILED": "Validation errors detected."
 }

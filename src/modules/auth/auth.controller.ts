@@ -1,13 +1,19 @@
-import { Controller, Get, UseGuards } from '@nestjs/common'
+import { Controller, Get, Post, Req, UseGuards } from '@nestjs/common'
+import { Request } from 'express'
+import { AuthService } from '@/src/modules/auth/auth.service'
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard'
 
 @Controller('auth')
 export class AuthController {
-  constructor() {}
+  constructor(private readonly authService: AuthService) {}
+  @Post('refresh')
+  async refreshToken(@Req() req: Request) {
+    return this.authService.refreshToken(req)
+  }
 
-  @Get('secure')
+  @Get('validateToken')
   @UseGuards(JwtAuthGuard)
-  getSecureMessage(): string {
-    return 'Este es un mensaje seguro solo accesible con un token válido'
+  getSecureMessage() {
+    return this.authService.getSecureMessage()
   }
 }

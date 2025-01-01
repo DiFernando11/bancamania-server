@@ -15,6 +15,7 @@
   "PASSWORD_STRING": "La contraseña debe ser una cadena de texto.",
   "PASSWORD_UPPERCASE": "La contraseña debe contener al menos una letra mayúscula.",
   "PHONE_REQUIRED": "El número de teléfono es obligatorio.",
+  "REFRESH_TOKEN_REQUIRED": "El refresh token es obligatorio.",
   "TOKEN_REQUIRED": "El token es obligatorio.",
   "VALIDATION_FAILED": "Validacion de errores detectada."
 }

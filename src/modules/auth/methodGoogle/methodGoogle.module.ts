@@ -16,9 +16,6 @@ import { MethodGoogleService } from './methodGoogle.service'
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         secret: configService.get<string>('jwt.secretKey'),
-        signOptions: {
-          expiresIn: configService.get<string>('jwt.expire') || '60s',
-        },
       }),
     }),
   ],
