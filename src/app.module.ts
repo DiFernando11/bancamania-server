@@ -1,12 +1,7 @@
 import { Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm'
-import {
-  AcceptLanguageResolver,
-  HeaderResolver,
-  I18nModule,
-  QueryResolver,
-} from 'nestjs-i18n'
+import { CookieResolver, I18nModule } from 'nestjs-i18n'
 import * as path from 'path'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
@@ -52,11 +47,7 @@ import { WhatsappModule } from './modules/whatsapp/whatsapp.module'
         path: path.join(__dirname, '../i18n'),
         watch: true,
       },
-      resolvers: [
-        { options: ['lang'], use: QueryResolver },
-        AcceptLanguageResolver,
-        new HeaderResolver(['x-lang']),
-      ],
+      resolvers: [new CookieResolver(['NEXT_LOCALE'])],
     }),
   ],
   providers: [AppService],
