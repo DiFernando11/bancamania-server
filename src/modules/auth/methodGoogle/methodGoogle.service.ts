@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { I18nService } from 'nestjs-i18n'
 import { HttpResponseStatus } from '@/src/common/constants'
 import { PromiseApiAuthResponse } from '@/src/common/types/apiResponse'
-import { HttpResponseSuccess, ThrowHttpException } from '@/src/common/utils'
+import { ThrowHttpException } from '@/src/common/utils'
 import { UsersService } from '@/src/modules/users/users.service'
 import { AuthShareService } from '../authShare.service'
 
@@ -42,7 +42,7 @@ export class MethodGoogleService {
       })
     }
 
-    const createPayload = {
+    const userData = {
       email: payload.email,
       firstName: userFind?.first_name || payload.given_name,
       image: userFind?.image || payload.picture,
@@ -50,9 +50,6 @@ export class MethodGoogleService {
       phone: userFind?.phone_number,
     }
 
-    return HttpResponseSuccess(this.i18n.t('auth.GOOGLE_AUTH_SUCCESS'), {
-      token: this.authShareService.createToken({ user: createPayload }),
-      user: createPayload,
-    })
+    return this.authShareService.authenticatedResponse({ userData })
   }
 }

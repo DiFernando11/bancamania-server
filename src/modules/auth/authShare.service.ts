@@ -1,47 +1,77 @@
-import { BadRequestException, Injectable } from '@nestjs/common'
+import { BadRequestException, HttpStatus, Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { JwtService } from '@nestjs/jwt'
 import { OAuth2Client } from 'google-auth-library'
-import { v4 as uuidv4 } from 'uuid'
+import { I18nService } from 'nestjs-i18n'
+import { HttpResponseStatus } from '@/src/common/constants'
+import { ClientUser } from '@/src/common/types'
+import { HttpResponseSuccess, ThrowHttpException } from '@/src/common/utils'
+import { globalConfig } from '@/src/config/global.config'
 
 @Injectable()
 export class AuthShareService {
   private client: OAuth2Client
   constructor(
     private readonly jwtService: JwtService,
-    private readonly configService: ConfigService
+    private readonly configService: ConfigService,
+    private readonly i18n: I18nService
   ) {
     this.client = new OAuth2Client(
       this.configService.get<string>('googleAuth.clientId')
     )
   }
 
-  generateSendCode() {
-    const verificationCode = uuidv4().slice(0, 6)
-    const verificationExpiresAt = new Date(Date.now() + 5 * 60 * 1000)
-
-    return {
-      verificationCode,
-      verificationExpiresAt,
+  verifyRefreshToken(refreshToken) {
+    try {
+      const payload = this.jwtService.verify(refreshToken, {
+        secret: this.configService.get<string>('jwt.secretKeyRefreshToken'),
+      })
+      return payload
+    } catch (error) {
+      console.error(error)
+      ThrowHttpException(
+        'Refresh token is caducated',
+        HttpResponseStatus.UNAUTHORIZED
+      )
     }
   }
 
-  verifyCodeRegister(code: string, user): Promise<any> {
-    if (!user) {
-      throw new BadRequestException('Usuario no encontrado')
-    }
+  generateAccessToken(data: ClientUser): string {
+    const payload = this.jwtService.sign(data, {
+      expiresIn: globalConfig.expireInAccesToken,
+    })
+    return payload
+  }
 
-    // Verifica si el código de verificación coincide
-    if (user.verificationCode !== code) {
-      throw new BadRequestException('Código de verificación incorrecto')
-    }
-
-    // Verifica si el código ha expirado
-    if (new Date() > user.verificationExpiresAt) {
-      throw new BadRequestException('El código de verificación ha expirado')
-    }
-
-    return user
+  generateRefreshToken(data: ClientUser): string {
+    const payload = this.jwtService.sign(data, {
+      expiresIn: globalConfig.expireInRefreshToken,
+      secret: this.configService.get<string>('jwt.secretKeyRefreshToken'),
+    })
+    return payload
+  }
+  authenticatedResponse({
+    userData,
+    statusCode,
+    restResponse,
+    message,
+  }: {
+    userData: ClientUser
+    message?: string
+    statusCode?: { code: HttpStatus; message: string }
+    restResponse?: object
+  }) {
+    const messageI18n = message ?? 'auth.LOGIN_SUCCESS'
+    return HttpResponseSuccess(
+      this.i18n.t(messageI18n),
+      {
+        refreshToken: this.generateRefreshToken(userData),
+        token: this.generateAccessToken(userData),
+        user: userData,
+        ...(restResponse || {}),
+      },
+      statusCode
+    )
   }
 
   async verifyGoogleToken(idToken) {
@@ -64,34 +94,5 @@ export class AuthShareService {
       console.error(error, 'ERROR EN verifyGoogleToken')
       throw new BadRequestException('Token inválido')
     }
-  }
-
-  verifyToken(token: string) {
-    try {
-      const decoded = this.jwtService.verify(token)
-
-      return decoded
-    } catch (error) {
-      console.error('Token inválido verifyToken:', error.message)
-      throw new BadRequestException('Token inválido')
-    }
-  }
-
-  createToken({ user, expiresIn = '5m' }) {
-    const token = this.jwtService.sign(
-      {
-        email: user.email,
-        firstName: user?.first_name || user?.firstName,
-        image: user?.image,
-        isVerifyPhone: true,
-        lastName: user?.last_name || user?.lastName,
-        phone: user?.phone || user?.phone_number,
-      },
-      {
-        expiresIn,
-      }
-    )
-
-    return token
   }
 }

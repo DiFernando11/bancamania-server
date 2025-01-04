@@ -1,11 +1,15 @@
 import { HttpStatus } from '@nestjs/common'
 
-export const HttpResponseStatus = {
-  // 400 Bad Request
-  BAD_REQUEST: { code: HttpStatus.BAD_REQUEST, message: 'Bad Request' },
-
+const HttpResponseStatusSuccess = {
   // 201 Created
   CREATED: { code: HttpStatus.CREATED, message: 'Resource Created' },
+  // 200 OK
+  OK: { code: HttpStatus.OK, message: 'Success' },
+}
+
+const HttpResponseStatusError = {
+  // 400 Bad Request
+  BAD_REQUEST: { code: HttpStatus.BAD_REQUEST, message: 'Bad Request' },
 
   // 403 Forbidden
   FORBIDDEN: { code: HttpStatus.FORBIDDEN, message: 'Forbidden' },
@@ -22,9 +26,6 @@ export const HttpResponseStatus = {
   // 204 No Content
   NO_CONTENT: { code: HttpStatus.NO_CONTENT, message: 'No Content' },
 
-  // 200 OK
-  OK: { code: HttpStatus.OK, message: 'Success' },
-
   // 401 Unauthorized
   UNAUTHORIZED: { code: HttpStatus.UNAUTHORIZED, message: 'Unauthorized' },
 
@@ -33,4 +34,9 @@ export const HttpResponseStatus = {
     code: HttpStatus.UNPROCESSABLE_ENTITY,
     message: 'Unprocessable Entity',
   },
+}
+
+export const HttpResponseStatus = {
+  ...HttpResponseStatusSuccess,
+  ...HttpResponseStatusError,
 }

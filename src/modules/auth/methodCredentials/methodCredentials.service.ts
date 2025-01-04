@@ -97,7 +97,7 @@ export class MethodCredentialsService {
       },
     })
 
-    const createPayload = {
+    const userData = {
       email,
       firstName: firstName || user?.first_name,
       image: user?.image,
@@ -105,17 +105,11 @@ export class MethodCredentialsService {
       phone: user?.phone_number,
     }
 
-    return HttpResponseSuccess(
-      this.i18n.t('auth.REGISTRATION_SUCCESS'),
-      {
-        token: this.authShareService.createToken({
-          expiresIn: '5m',
-          user: createPayload,
-        }),
-        user: createPayload,
-      },
-      HttpResponseStatus.CREATED
-    )
+    return this.authShareService.authenticatedResponse({
+      message: 'auth.REGISTRATION_SUCCESS',
+      statusCode: HttpResponseStatus.CREATED,
+      userData,
+    })
   }
 
   async loginWithCredentials({
@@ -140,7 +134,7 @@ export class MethodCredentialsService {
       )
     }
 
-    const createPayload = {
+    const userData = {
       email: user.email,
       firstName: user.first_name,
       image: user.image,
@@ -148,11 +142,6 @@ export class MethodCredentialsService {
       phone: user.phone_number,
     }
 
-    return HttpResponseSuccess(this.i18n.t('auth.LOGIN_SUCCESS'), {
-      token: this.authShareService.createToken({
-        user: createPayload,
-      }),
-      user: createPayload,
-    })
+    return this.authShareService.authenticatedResponse({ userData })
   }
 }

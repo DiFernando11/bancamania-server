@@ -75,7 +75,7 @@ export class MethodPhoneService {
 
     const user = await this.usersService.findByAttribute('phone_number', phone)
 
-    const createPayload = {
+    const userData = {
       email: user?.email,
       firstName: user?.first_name,
       image: user?.image,
@@ -88,10 +88,9 @@ export class MethodPhoneService {
     if (isUserRegistered) {
       await this.firebaseService.deleteCodeById(codeSaved.id)
 
-      return HttpResponseSuccess(this.i18n.t('auth.LOGIN_SUCCESS'), {
-        isUserRegistered,
-        token: this.authShareService.createToken({ user: createPayload }),
-        user: createPayload,
+      return this.authShareService.authenticatedResponse({
+        restResponse: { isUserRegistered },
+        userData,
       })
     }
 
@@ -100,7 +99,7 @@ export class MethodPhoneService {
     })
 
     return HttpResponseSuccess(this.i18n.t('auth.LINK_PHONE_EMAIL'), {
-      isUserRegistered,
+      isUserRegistered: false,
     })
   }
 
@@ -150,7 +149,7 @@ export class MethodPhoneService {
 
     await this.firebaseService.deleteCodeById(codeSaved.id)
 
-    const createPayload = {
+    const userData = {
       email: payload.email,
       firstName: user?.first_name || payload.given_name,
       image: user?.image || payload.picture,
@@ -158,13 +157,10 @@ export class MethodPhoneService {
       phone,
     }
 
-    return HttpResponseSuccess(
-      this.i18n.t('auth.REGISTRATION_SUCCESS'),
-      {
-        token: this.authShareService.createToken({ user: createPayload }),
-        user: createPayload,
-      },
-      HttpResponseStatus.CREATED
-    )
+    return this.authShareService.authenticatedResponse({
+      message: 'auth.REGISTRATION_SUCCESS',
+      statusCode: HttpResponseStatus.CREATED,
+      userData,
+    })
   }
 }

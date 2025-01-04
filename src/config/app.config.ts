@@ -24,8 +24,8 @@ export default () => ({
     clientId: process.env.GOOGLE_CLIENT_ID,
   },
   jwt: {
-    expire: process.env.EXPIRES_IN_JWT,
     secretKey: process.env.SECRET_KEY_JWT,
+    secretKeyRefreshToken: process.env.SECRET_KEY_REFRESH_JWT,
   },
   sendEmail: {
     host: process.env.MAIL_HOST,

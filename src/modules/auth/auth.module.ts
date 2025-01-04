@@ -8,6 +8,8 @@ import { SmsService } from 'src/modules/sms/sms.service'
 import { Usuario } from 'src/modules/users/users.entity'
 import { UsersService } from 'src/modules/users/users.service'
 import { WhatsappService } from 'src/modules/whatsapp/whatsapp.service'
+import { AuthService } from '@/src/modules/auth/auth.service'
+import { AuthShareService } from '@/src/modules/auth/authShare.service'
 import { JwtStrategy } from '../../strategies/jwt.strategy'
 import { AuthController } from './auth.controller'
 import { MethodCredentialsModule } from './methodCredentials/methodCredentials.module'
@@ -21,9 +23,6 @@ import { MethodPhoneModule } from './methodPhone/methodPhone.module'
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         secret: configService.get<string>('jwt.secretKey'),
-        signOptions: {
-          expiresIn: configService.get<string>('jwt.expire') || '60s',
-        },
       }),
     }),
     TypeOrmModule.forFeature([Usuario]),
@@ -44,6 +43,8 @@ import { MethodPhoneModule } from './methodPhone/methodPhone.module'
     MailService,
     SmsService,
     WhatsappService,
+    AuthService,
+    AuthShareService,
   ],
 })
 export class AuthModule {}
