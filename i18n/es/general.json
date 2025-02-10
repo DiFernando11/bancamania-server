@@ -1,5 +1,6 @@
 {
   "MIN_LENGTH": "El campo {field} debe tener al menos {length} caracteres.",
   "REQUIRED_FIELD": "El campo {field} es obligatorio.",
+  "USER_NOT_FOUND": "Usuario no encontrado",
   "VALIDATION_FAILED": "Errores de validación detectados."
 }
