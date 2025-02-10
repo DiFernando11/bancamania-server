@@ -1,4 +1,12 @@
-import { Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm'
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToOne,
+  PrimaryGeneratedColumn,
+  Unique,
+} from 'typeorm'
+import { Account } from '../account/account.entity'
 
 @Entity()
 @Unique(['email', 'phone_number']) // Hacemos que el teléfono también sea único
@@ -29,4 +37,7 @@ export class Usuario {
 
   @Column({ nullable: true, unique: true })
   phone_number: string
+
+  @OneToOne(() => Account, (account) => account.user)
+  account: Account
 }

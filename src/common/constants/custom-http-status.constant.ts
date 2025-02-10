@@ -11,6 +11,12 @@ const HttpResponseStatusError = {
   // 400 Bad Request
   BAD_REQUEST: { code: HttpStatus.BAD_REQUEST, message: 'Bad Request' },
 
+  // 409 Conflict
+  CONFLICT: {
+    code: HttpStatus.CONFLICT,
+    message: 'Conflic',
+  },
+
   // 403 Forbidden
   FORBIDDEN: { code: HttpStatus.FORBIDDEN, message: 'Forbidden' },
 
