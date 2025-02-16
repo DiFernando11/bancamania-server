@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common'
+import { InjectRepository } from '@nestjs/typeorm'
 import * as bcrypt from 'bcryptjs'
 import { I18nService } from 'nestjs-i18n'
+import { Repository } from 'typeorm'
 import { HttpResponseStatus } from '@/src/common/constants'
 import { PromiseApiResponse } from '@/src/common/types'
 import { PromiseApiAuthResponse } from '@/src/common/types/apiResponse'
@@ -14,6 +16,7 @@ import {
 } from '@/src/modules/auth/methodCredentials/types'
 import { FirebaseService } from '@/src/modules/firebase/firebase.service'
 import { MailService } from '@/src/modules/mail/mail.service'
+import { Usuario } from '@/src/modules/users/users.entity'
 import { UsersService } from '@/src/modules/users/users.service'
 
 @Injectable()
@@ -23,7 +26,9 @@ export class MethodCredentialsService {
     private readonly usersService: UsersService,
     private readonly mailService: MailService,
     private readonly firebaseService: FirebaseService,
-    private readonly i18n: I18nService
+    private readonly i18n: I18nService,
+    @InjectRepository(Usuario)
+    private readonly userRepository: Repository<Usuario>
   ) {}
 
   async sendCodeRegisterCredentials({
@@ -116,7 +121,10 @@ export class MethodCredentialsService {
     email,
     password,
   }: LoginCredentials): PromiseApiAuthResponse {
-    const user = await this.usersService.findByEmail(email)
+    const user = await this.userRepository.findOne({
+      relations: ['account'],
+      where: { email },
+    })
 
     if (!user) {
       ThrowHttpException(
@@ -142,6 +150,9 @@ export class MethodCredentialsService {
       phone: user.phone_number,
     }
 
-    return this.authShareService.authenticatedResponse({ userData })
+    return this.authShareService.authenticatedResponse({
+      restResponse: { finishedOnBoarding: Boolean(user.account) },
+      userData,
+    })
   }
 }
