@@ -1,3 +1,5 @@
 {
-  "ACCOUNT_EXISTS": "The user already has a registered account"
+  "ACCOUNT_EXISTS": "The user already has a registered account",
+  "CREATE_ACCOUNT": "The user account has been created successfully",
+  "GET_SUCCESS": "The consultation was carried out successfully"
 }
