@@ -24,7 +24,6 @@ export class DebitCardService {
       relations: ['account', 'debitCard'],
       where: { email: req.email },
     })
-    console.log(user, 'DEBIT CARD')
     if (!user) {
       ThrowHttpException(
         this.i18n.t('general.USER_NOT_FOUND'),
@@ -48,5 +47,24 @@ export class DebitCardService {
     await this.debitCardRepository.save(newCard)
 
     return HttpResponseSuccess(this.i18n.t('tarjetas.CREATE_DEBIT'))
+  }
+
+  async getCardDebit(req) {
+    const user = await this.userRepository.findOne({
+      relations: ['debitCard'],
+      where: { email: req.email },
+    })
+
+    if (!user) {
+      ThrowHttpException(
+        this.i18n.t('general.USER_NOT_FOUND'),
+        HttpResponseStatus.NOT_FOUND
+      )
+    }
+    return HttpResponseSuccess(this.i18n.t('general.GET_SUCCESS'), {
+      debitCard: user.debitCard,
+      firstName: user.first_name,
+      lastName: user.last_name,
+    })
   }
 }

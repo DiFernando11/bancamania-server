@@ -1,4 +1,5 @@
 {
+  "GET_SUCCESS": "The consultation was carried out successfully",
   "MIN_LENGTH": "The field {field} must be at least {length} characters.",
   "REQUIRED_FIELD": "The field {field} is required.",
   "USER_NOT_FOUND": "User not found",

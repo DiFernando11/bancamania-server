@@ -66,7 +66,7 @@ export class AccountService {
         HttpResponseStatus.NOT_FOUND
       )
     }
-    return HttpResponseSuccess(this.i18n.t('account.GET_SUCCESS'), {
+    return HttpResponseSuccess(this.i18n.t('general.GET_SUCCESS'), {
       account: user.account,
       firstName: user.first_name,
       lastName: user.last_name,
