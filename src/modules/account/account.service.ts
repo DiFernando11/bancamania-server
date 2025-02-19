@@ -36,18 +36,17 @@ export class AccountService {
         HttpResponseStatus.CONFLICT
       )
     }
-
     const numberAccount =
       usuario.id.slice(0, 4) +
       Math.floor(100000 + Math.random() * 900000).toString()
 
-    const account = new Account()
-    account.accountNumber = numberAccount
-    account.balance = 50
-    account.status = 'active'
-    account.user = usuario
+    const newAccount = this.accountRepository.create({
+      accountNumber: numberAccount,
+      balance: 50,
+      user: usuario,
+    })
 
-    await this.accountRepository.save(account)
+    await this.accountRepository.save(newAccount)
     return HttpResponseSuccess(this.i18n.t('account.CREATE_ACCOUNT'), {
       firstName: usuario?.first_name,
       lastName: usuario?.last_name,
@@ -56,7 +55,6 @@ export class AccountService {
   }
 
   async getAccountUser(req) {
-    console.log('LLAMANDO AL SERVICIO')
     const user = await this.userRepository.findOne({
       relations: ['account'],
       where: { email: req.email },

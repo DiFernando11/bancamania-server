@@ -1,0 +1,4 @@
+{
+  "CREATE_DEBIT": "Se asigna la tarjeta de debito al usuario de manera exitosa",
+  "DEBIT_EXISTS": "El usuario ya tiene una tarjeta de debito registrada."
+}

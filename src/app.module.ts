@@ -4,6 +4,7 @@ import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm'
 import { CookieResolver, I18nModule } from 'nestjs-i18n'
 import * as path from 'path'
 import { AccountModule } from '@/src/modules/account/account.module'
+import { DebitCardModule } from '@/src/modules/tarjetas/debitCard/debitCard.module'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
 import appConfig from './config/app.config'
@@ -28,6 +29,7 @@ import { WhatsappModule } from './modules/whatsapp/whatsapp.module'
     FirebaseModule,
     CroneModule,
     AccountModule,
+    DebitCardModule,
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
