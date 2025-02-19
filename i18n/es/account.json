@@ -1,5 +1,4 @@
 {
   "ACCOUNT_EXISTS": "El usuario ya tiene una cuenta registrada",
-  "CREATE_ACCOUNT": "La cuenta del usuario ha sido creada de manera exitosa",
-  "GET_SUCCESS": "La consulta se realizo de manera exitosa"
+  "CREATE_ACCOUNT": "La cuenta del usuario ha sido creada de manera exitosa"
 }

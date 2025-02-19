@@ -1,4 +1,5 @@
 {
+  "GET_SUCCESS": "La consulta se realizo de manera exitosa",
   "MIN_LENGTH": "El campo {field} debe tener al menos {length} caracteres.",
   "REQUIRED_FIELD": "El campo {field} es obligatorio.",
   "USER_NOT_FOUND": "Usuario no encontrado",
