@@ -6,6 +6,7 @@ import {
   PrimaryGeneratedColumn,
   Unique,
 } from 'typeorm'
+import { DebitCard } from '@/src/modules/tarjetas/debitCard/debitCard.entity'
 import { Account } from '../account/account.entity'
 
 @Entity()
@@ -40,4 +41,7 @@ export class Usuario {
 
   @OneToOne(() => Account, (account) => account.user)
   account: Account
+
+  @OneToOne(() => DebitCard, (debitCard) => debitCard.user)
+  debitCard: DebitCard
 }

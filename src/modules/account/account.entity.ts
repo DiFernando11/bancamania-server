@@ -21,10 +21,7 @@ export class Account {
   @Column({ default: () => 'CURRENT_TIMESTAMP', type: 'timestamp' })
   createdAt: Date
 
-  @Column({ default: 'active' })
-  status: 'active' | 'blocked' | 'suspended'
-
   @OneToOne(() => Usuario, (user) => user.account)
-  @JoinColumn({ name: 'userId' }) // Se define la clave foránea
+  @JoinColumn({ name: 'userId' })
   user: Usuario
 }
