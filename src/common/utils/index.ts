@@ -1,3 +1,5 @@
+export { formatDate } from './formatDate'
+export { fullName } from './fullName'
 export {
   HttpResponseError,
   HttpResponseSuccess,

@@ -2,11 +2,13 @@ import {
   Column,
   Entity,
   JoinColumn,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
   Unique,
 } from 'typeorm'
 import { Account } from '@/src/modules/account/account.entity'
+import { Movement } from '@/src/modules/movements/movements.entity'
 import { Usuario } from '@/src/modules/users/users.entity'
 
 @Entity()
@@ -21,6 +23,9 @@ export class DebitCard {
   @Column()
   expirationDate: string
 
+  @Column({ default: () => 'CURRENT_TIMESTAMP', type: 'timestamp' })
+  createdAt: Date
+
   @Column()
   cvv: string
 
@@ -34,4 +39,7 @@ export class DebitCard {
   @OneToOne(() => Account, { onDelete: 'CASCADE' })
   @JoinColumn()
   account: Account
+
+  @OneToMany(() => Movement, (movement) => movement.debitCard)
+  movements: Movement[]
 }

@@ -1,6 +1,9 @@
 {
+  "BALANCE_NUMBER": "El balance debe ser un número",
   "CODE_LENGTH": "El código debe tener exactamente 6 caracteres.",
   "CODE_REQUIRED": "El código de verificación es obligatorio.",
+  "DESCRIPTION_REQUIRED": "La descripción es obligatoria",
+  "DESCRIPTION_STRING": "La descripción debe ser una cadena de texto",
   "EMAIL_INVALID": "El formato del correo electrónico es incorrecto (ej. usuario@dominio.com).",
   "EMAIL_REQUIRED": "El correo electrónico es obligatorio.",
   "FIRSTNAME_REQUIRED": "El nombre es obligatorio.",
@@ -16,6 +19,12 @@
   "PASSWORD_UPPERCASE": "La contraseña debe contener al menos una letra mayúscula.",
   "PHONE_REQUIRED": "El número de teléfono es obligatorio.",
   "REFRESH_TOKEN_REQUIRED": "El refresh token es obligatorio.",
+  "RELATIONS_ARRAY": "Las relaciones deben ser un arreglo",
+  "RELATIONS_INVALID": "Solo se permiten las relaciones 'account' y 'debitCard'",
+  "RELATIONS_UNIQUE": "No se permiten relaciones duplicadas",
+  "TITLE_REQUIRED": "El título es obligatorio",
+  "TITLE_STRING": "El título debe ser una cadena de texto",
   "TOKEN_REQUIRED": "El token es obligatorio.",
+  "TYPE_MOVEMENT_INVALID": "El tipo de movimiento debe ser Wallet o Transferencia",
   "VALIDATION_FAILED": "Validacion de errores detectada."
 }

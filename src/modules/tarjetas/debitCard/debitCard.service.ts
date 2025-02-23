@@ -3,7 +3,15 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { I18nService } from 'nestjs-i18n'
 import { Repository } from 'typeorm'
 import { HttpResponseStatus } from '@/src/common/constants'
-import { HttpResponseSuccess, ThrowHttpException } from '@/src/common/utils'
+import {
+  formatDate,
+  fullName,
+  HttpResponseSuccess,
+  ThrowHttpException,
+} from '@/src/common/utils'
+import { EntitiesType } from '@/src/enum/entities.enum'
+import { TypeMovement } from '@/src/modules/movements/enum/type-movement.enum'
+import { MovementsService } from '@/src/modules/movements/movements.service'
 import { TarjetasService } from '@/src/modules/tarjetas/tarjetas.service'
 import { Usuario } from '@/src/modules/users/users.entity'
 import { DebitCard } from './debitCard.entity'
@@ -16,12 +24,13 @@ export class DebitCardService {
     @InjectRepository(Usuario)
     private readonly userRepository: Repository<Usuario>,
     private readonly i18n: I18nService,
-    private readonly tarjetasService: TarjetasService
+    private readonly tarjetasService: TarjetasService,
+    private readonly movements: MovementsService
   ) {}
 
   async createDebitCard(req) {
     const user = await this.userRepository.findOne({
-      relations: ['account', 'debitCard'],
+      relations: [EntitiesType.ACCOUNT, EntitiesType.DEBIT_CARD],
       where: { email: req.email },
     })
     if (!user) {
@@ -44,14 +53,25 @@ export class DebitCardService {
       expirationDate: this.tarjetasService.generateExpirationDate(),
       user: user,
     })
-    await this.debitCardRepository.save(newCard)
+    const currentCard = await this.debitCardRepository.save(newCard)
+    await this.movements.createLastMovement(
+      { ...user, debitCard: currentCard },
+      {
+        description: this.i18n.t('movements.MOV_DEBIT_CREATE', {
+          args: { date: formatDate(currentCard.createdAt, 'DD MMM') },
+        }),
+        relations: [EntitiesType.ACCOUNT, EntitiesType.DEBIT_CARD],
+        title: fullName(user),
+        typeMovement: TypeMovement.CARD,
+      }
+    )
 
     return HttpResponseSuccess(this.i18n.t('tarjetas.CREATE_DEBIT'))
   }
 
   async getCardDebit(req) {
     const user = await this.userRepository.findOne({
-      relations: ['debitCard'],
+      relations: [EntitiesType.DEBIT_CARD],
       where: { email: req.email },
     })
 
