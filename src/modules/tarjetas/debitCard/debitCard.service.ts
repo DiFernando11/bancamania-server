@@ -7,6 +7,7 @@ import {
   formatDate,
   fullName,
   HttpResponseSuccess,
+  saveTranslation,
   ThrowHttpException,
 } from '@/src/common/utils'
 import { EntitiesType } from '@/src/enum/entities.enum'
@@ -58,8 +59,9 @@ export class DebitCardService {
     await this.movements.createLastMovement(
       { ...user, debitCard: currentCard },
       {
-        description: this.i18n.t('movements.MOV_DEBIT_CREATE', {
+        description: saveTranslation({
           args: { date: formatDate(currentCard.createdAt, 'DD MMM') },
+          key: 'movements.MOV_DEBIT_CREATE',
         }),
         relations: [EntitiesType.ACCOUNT, EntitiesType.DEBIT_CARD],
         title: fullName(user),

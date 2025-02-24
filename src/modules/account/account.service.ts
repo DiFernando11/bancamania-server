@@ -7,6 +7,7 @@ import {
   formatDate,
   fullName,
   HttpResponseSuccess,
+  saveTranslation,
   ThrowHttpException,
 } from '@/src/common/utils'
 import { EntitiesType } from '@/src/enum/entities.enum'
@@ -61,8 +62,9 @@ export class AccountService {
     await this.movements.createLastMovement(
       { ...user, account: currentAccount },
       {
-        description: this.i18n.t('movements.MOV_ACCOUNT_CREATE', {
+        description: saveTranslation({
           args: { date: formatDate(currentAccount.createdAt, 'DD MMM') },
+          key: 'movements.MOV_ACCOUNT_CREATE',
         }),
         relations: [EntitiesType.ACCOUNT],
         title: fullName(user),
@@ -73,7 +75,9 @@ export class AccountService {
       { ...user, account: currentAccount },
       {
         balance: initialBalance,
-        description: this.i18n.t('movements.MOV_GIFT_BALANCE'),
+        description: saveTranslation({
+          key: 'movements.MOV_GIFT_BALANCE',
+        }),
         relations: [EntitiesType.ACCOUNT],
         title: fullName(user),
         typeMovement: TypeMovement.GIFT,

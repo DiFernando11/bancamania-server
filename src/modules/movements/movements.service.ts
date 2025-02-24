@@ -11,6 +11,7 @@ import { Equal, Repository } from 'typeorm'
 import { HttpResponseStatus } from '@/src/common/constants'
 import {
   createPaginationData,
+  getTranslation,
   HttpResponseError,
   HttpResponseSuccess,
   ThrowHttpException,
@@ -83,9 +84,19 @@ export class MovementsService {
         where: { user: req.id, ...filters },
       })
 
-      return HttpResponseSuccess(this.i18n.t('movements.CREATE_MOVE'), {
+      const translatedMovements = movements.map((movement) => {
+        return {
+          ...movement,
+          description: getTranslation({
+            description: movement.description,
+            i18n: this.i18n,
+          }),
+        }
+      })
+
+      return HttpResponseSuccess(null, {
         ...createResponse(total),
-        movements,
+        movements: translatedMovements,
       })
     } catch (error) {
       return HttpResponseError(error.message)
