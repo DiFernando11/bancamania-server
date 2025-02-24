@@ -78,6 +78,7 @@ export class MethodPhoneService {
     const userData = {
       email: user?.email,
       firstName: user?.first_name,
+      id: user?.id,
       image: user?.image,
       lastName: user?.last_name,
       phone,
@@ -152,6 +153,7 @@ export class MethodPhoneService {
     const userData = {
       email: payload.email,
       firstName: user?.first_name || payload.given_name,
+      id: user?.id,
       image: user?.image || payload.picture,
       lastName: user?.last_name || payload.family_name,
       phone,

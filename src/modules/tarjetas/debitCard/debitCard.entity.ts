@@ -29,6 +29,9 @@ export class DebitCard {
   @Column()
   cvv: string
 
+  @Column()
+  owner: string
+
   @Column({ default: 'inactive' })
   status: 'active' | 'blocked' | 'suspended' | 'inactive'
 

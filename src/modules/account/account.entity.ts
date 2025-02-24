@@ -23,6 +23,9 @@ export class Account {
   @Column({ default: () => 'CURRENT_TIMESTAMP', type: 'timestamp' })
   createdAt: Date
 
+  @Column()
+  owner: string
+
   @OneToOne(() => Usuario, (user) => user.account)
   @JoinColumn({ name: 'userId' })
   user: Usuario
