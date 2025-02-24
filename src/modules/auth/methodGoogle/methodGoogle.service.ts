@@ -45,6 +45,7 @@ export class MethodGoogleService {
     const userData = {
       email: payload.email,
       firstName: userFind?.first_name || payload.given_name,
+      id: userFind?.id,
       image: userFind?.image || payload.picture,
       lastName: userFind?.last_name || payload.family_name,
       phone: userFind?.phone_number,

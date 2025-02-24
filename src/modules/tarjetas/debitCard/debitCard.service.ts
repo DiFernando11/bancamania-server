@@ -51,6 +51,7 @@ export class DebitCardService {
       cardNumber: this.tarjetasService.generateCardNumber(),
       cvv: this.tarjetasService.generateCVV(),
       expirationDate: this.tarjetasService.generateExpirationDate(),
+      owner: fullName(user),
       user: user,
     })
     const currentCard = await this.debitCardRepository.save(newCard)
@@ -70,21 +71,10 @@ export class DebitCardService {
   }
 
   async getCardDebit(req) {
-    const user = await this.userRepository.findOne({
-      relations: [EntitiesType.DEBIT_CARD],
-      where: { email: req.email },
+    const debitCard = await this.debitCardRepository.findOne({
+      where: { user: req.id },
     })
 
-    if (!user) {
-      ThrowHttpException(
-        this.i18n.t('general.USER_NOT_FOUND'),
-        HttpResponseStatus.NOT_FOUND
-      )
-    }
-    return HttpResponseSuccess(this.i18n.t('general.GET_SUCCESS'), {
-      debitCard: user.debitCard,
-      firstName: user.first_name,
-      lastName: user.last_name,
-    })
+    return HttpResponseSuccess(this.i18n.t('general.GET_SUCCESS'), debitCard)
   }
 }

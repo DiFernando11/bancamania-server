@@ -26,10 +26,7 @@ export class AuthService {
 
     const newAccessToken = this.authShareService.generateAccessToken({
       email: payload.email,
-      firstName: payload.firstName,
-      image: payload.image,
-      lastName: payload.lastName,
-      phone: payload.phone,
+      id: payload.id,
     })
 
     return HttpResponseSuccess(this.i18n.t('auth.REFRESH_TOKEN_SUCCESS'), {

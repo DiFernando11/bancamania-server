@@ -1,9 +1,20 @@
-import { Injectable } from '@nestjs/common'
+import {
+  BadRequestException,
+  HttpException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { I18nService } from 'nestjs-i18n'
-import { Repository } from 'typeorm'
+import { Equal, Repository } from 'typeorm'
 import { HttpResponseStatus } from '@/src/common/constants'
-import { HttpResponseSuccess, ThrowHttpException } from '@/src/common/utils'
+import {
+  createPaginationData,
+  HttpResponseError,
+  HttpResponseSuccess,
+  ThrowHttpException,
+} from '@/src/common/utils'
 import { CreateMovementDto } from '@/src/modules/movements/dto/create-movement.dto'
 import { Movement } from '@/src/modules/movements/movements.entity'
 import { Usuario } from '@/src/modules/users/users.entity'
@@ -19,7 +30,6 @@ export class MovementsService {
   ) {}
 
   async createLastMovement(user: Usuario, movementData: CreateMovementDto) {
-    console.log(user, 'USER')
     const movement = this.movementRepository.create({
       ...movementData,
       account: user?.account,
@@ -47,5 +57,38 @@ export class MovementsService {
     await this.createLastMovement(user, rest)
 
     return HttpResponseSuccess(this.i18n.t('movements.CREATE_MOVE'))
+  }
+
+  async getUserMovements(req) {
+    try {
+      const { accountId, debitCardId, limit, page } = req.query
+      const filters: any = {}
+      if (accountId) {
+        filters.account = Equal(accountId)
+      }
+
+      if (debitCardId) {
+        filters.debitCard = Equal(debitCardId)
+      }
+      const { skip, take, createResponse } = createPaginationData({
+        limit,
+        page,
+      })
+      const [movements, total] = await this.movementRepository.findAndCount({
+        order: {
+          createdAt: 'DESC',
+        },
+        skip,
+        take,
+        where: { user: req.id, ...filters },
+      })
+
+      return HttpResponseSuccess(this.i18n.t('movements.CREATE_MOVE'), {
+        ...createResponse(total),
+        movements,
+      })
+    } catch (error) {
+      return HttpResponseError(error.message)
+    }
   }
 }

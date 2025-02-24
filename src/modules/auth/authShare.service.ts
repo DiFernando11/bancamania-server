@@ -65,8 +65,14 @@ export class AuthShareService {
     return HttpResponseSuccess(
       this.i18n.t(messageI18n),
       {
-        refreshToken: this.generateRefreshToken(userData),
-        token: this.generateAccessToken(userData),
+        refreshToken: this.generateRefreshToken({
+          email: userData.email,
+          id: userData.id,
+        }),
+        token: this.generateAccessToken({
+          email: userData.email,
+          id: userData.id,
+        }),
         user: userData,
         ...(restResponse || {}),
       },

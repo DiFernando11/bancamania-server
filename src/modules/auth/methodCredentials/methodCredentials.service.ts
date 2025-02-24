@@ -105,6 +105,7 @@ export class MethodCredentialsService {
     const userData = {
       email,
       firstName: firstName || user?.first_name,
+      id: user?.id,
       image: user?.image,
       lastName: lastName || user?.last_name,
       phone: user?.phone_number,
@@ -145,6 +146,7 @@ export class MethodCredentialsService {
     const userData = {
       email: user.email,
       firstName: user.first_name,
+      id: user.id,
       image: user.image,
       lastName: user.last_name,
       phone: user.phone_number,

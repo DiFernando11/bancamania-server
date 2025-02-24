@@ -53,6 +53,7 @@ export class AccountService {
     const newAccount = this.accountRepository.create({
       accountNumber: numberAccount,
       balance: initialBalance,
+      owner: fullName(user),
       user,
     })
 
@@ -86,21 +87,10 @@ export class AccountService {
   }
 
   async getAccountUser(req) {
-    const user = await this.userRepository.findOne({
-      relations: [EntitiesType.ACCOUNT],
-      where: { email: req.email },
+    const user = await this.accountRepository.findOne({
+      where: { user: req.id },
     })
 
-    if (!user) {
-      ThrowHttpException(
-        this.i18n.t('general.USER_NOT_FOUND'),
-        HttpResponseStatus.NOT_FOUND
-      )
-    }
-    return HttpResponseSuccess(this.i18n.t('general.GET_SUCCESS'), {
-      account: user.account,
-      firstName: user.first_name,
-      lastName: user.last_name,
-    })
+    return HttpResponseSuccess(this.i18n.t('general.GET_SUCCESS'), user)
   }
 }
