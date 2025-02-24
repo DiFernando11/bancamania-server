@@ -2,9 +2,11 @@ import {
   Column,
   Entity,
   JoinColumn,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm'
+import { Movement } from '@/src/modules/movements/movements.entity'
 import { Usuario } from '../users/users.entity'
 
 @Entity()
@@ -24,4 +26,7 @@ export class Account {
   @OneToOne(() => Usuario, (user) => user.account)
   @JoinColumn({ name: 'userId' })
   user: Usuario
+
+  @OneToMany(() => Movement, (movement) => movement.account)
+  movements: Movement[]
 }

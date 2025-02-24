@@ -2,10 +2,12 @@ import {
   Column,
   Entity,
   JoinColumn,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
   Unique,
 } from 'typeorm'
+import { Movement } from '@/src/modules/movements/movements.entity'
 import { DebitCard } from '@/src/modules/tarjetas/debitCard/debitCard.entity'
 import { Account } from '../account/account.entity'
 
@@ -44,4 +46,7 @@ export class Usuario {
 
   @OneToOne(() => DebitCard, (debitCard) => debitCard.user)
   debitCard: DebitCard
+
+  @OneToMany(() => Movement, (movement) => movement.user)
+  movements: Movement[]
 }

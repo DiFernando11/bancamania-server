@@ -6,6 +6,8 @@ import { Usuario } from 'src/modules/users/users.entity'
 import { AccountController } from '@/src/modules/account/account.controller'
 import { Account } from '@/src/modules/account/account.entity'
 import { AccountService } from '@/src/modules/account/account.service'
+import { Movement } from '@/src/modules/movements/movements.entity'
+import { MovementsService } from '@/src/modules/movements/movements.service'
 import { UsersService } from '@/src/modules/users/users.service'
 import { JwtStrategy } from '../../strategies/jwt.strategy'
 
@@ -20,7 +22,8 @@ import { JwtStrategy } from '../../strategies/jwt.strategy'
     }),
     TypeOrmModule.forFeature([Account]),
     TypeOrmModule.forFeature([Usuario]),
+    TypeOrmModule.forFeature([Movement]),
   ],
-  providers: [JwtStrategy, AccountService, UsersService],
+  providers: [JwtStrategy, AccountService, UsersService, MovementsService],
 })
 export class AccountModule {}
