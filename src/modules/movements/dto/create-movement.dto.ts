@@ -1,11 +1,8 @@
-// src/movements/dto/create-movement.dto.ts
 import {
   ArrayUnique,
   IsArray,
-  IsBoolean,
   IsEnum,
   IsIn,
-  IsInt,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -17,6 +14,9 @@ export class CreateMovementDto {
   @IsOptional()
   @IsNumber({}, { message: 'BALANCE_NUMBER' })
   balance?: number
+
+  @IsNumber({}, { message: 'TOTAL_BALANCE_NUMBER' })
+  totalBalance?: number
 
   @IsString({ message: 'TITLE_STRING' })
   @IsNotEmpty({ message: 'TITLE_REQUIRED' })

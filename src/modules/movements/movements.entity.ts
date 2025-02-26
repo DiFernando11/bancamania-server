@@ -19,6 +19,9 @@ export class Movement {
   @Column({ nullable: true, precision: 10, scale: 2, type: 'decimal' })
   balance?: number
 
+  @Column({ precision: 10, scale: 2, type: 'decimal' })
+  totalBalance: number
+
   @Column({ length: 255, type: 'varchar' })
   title: string
 

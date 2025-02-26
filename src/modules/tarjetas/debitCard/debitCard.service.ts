@@ -66,6 +66,7 @@ export class DebitCardService {
         }),
         relations: [EntitiesType.ACCOUNT, EntitiesType.DEBIT_CARD],
         title: fullName(user),
+        totalBalance: 50,
         typeMovement: TypeMovement.CARD,
       }
     )

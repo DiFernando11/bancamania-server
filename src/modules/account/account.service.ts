@@ -67,6 +67,7 @@ export class AccountService {
         }),
         relations: [EntitiesType.ACCOUNT],
         title: fullName(user),
+        totalBalance: 0,
         typeMovement: TypeMovement.WALLET,
       }
     )
@@ -79,6 +80,7 @@ export class AccountService {
         }),
         relations: [EntitiesType.ACCOUNT],
         title: fullName(user),
+        totalBalance: 50,
         typeMovement: TypeMovement.GIFT,
       }
     )
