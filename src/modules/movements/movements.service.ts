@@ -46,7 +46,7 @@ export class MovementsService {
 
     const user = await this.userRepository.findOne({
       relations,
-      where: { email: req.email },
+      where: { id: req.user.id },
     })
 
     if (!user) {
@@ -81,7 +81,7 @@ export class MovementsService {
         },
         skip,
         take,
-        where: { user: req.id, ...filters },
+        where: { user: { id: req.user.id }, ...filters },
       })
 
       const translatedMovements = movements.map((movement) => {

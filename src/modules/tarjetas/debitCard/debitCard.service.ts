@@ -6,6 +6,7 @@ import { HttpResponseStatus } from '@/src/common/constants'
 import {
   formatDate,
   fullName,
+  generateUniqueNumber,
   HttpResponseSuccess,
   saveTranslation,
   ThrowHttpException,
@@ -32,7 +33,7 @@ export class DebitCardService {
   async createDebitCard(req) {
     const user = await this.userRepository.findOne({
       relations: [EntitiesType.ACCOUNT, EntitiesType.DEBIT_CARD],
-      where: { email: req.email },
+      where: { id: req.user.id },
     })
     if (!user) {
       ThrowHttpException(
@@ -49,7 +50,7 @@ export class DebitCardService {
 
     const newCard = this.debitCardRepository.create({
       account: user.account,
-      cardNumber: this.tarjetasService.generateCardNumber(),
+      cardNumber: generateUniqueNumber(user.id, 16, 2),
       cvv: this.tarjetasService.generateCVV(),
       expirationDate: this.tarjetasService.generateExpirationDate(),
       owner: fullName(user),
@@ -74,7 +75,7 @@ export class DebitCardService {
 
   async getCardDebit(req) {
     const debitCard = await this.debitCardRepository.findOne({
-      where: { user: req.id },
+      where: { user: { id: req.user.id } },
     })
 
     return HttpResponseSuccess(this.i18n.t('general.GET_SUCCESS'), debitCard)

@@ -6,6 +6,7 @@ import { HttpResponseStatus } from '@/src/common/constants'
 import {
   formatDate,
   fullName,
+  generateUniqueNumber,
   HttpResponseSuccess,
   saveTranslation,
   ThrowHttpException,
@@ -31,7 +32,7 @@ export class AccountService {
     const initialBalance = 50
     const user = await this.userRepository.findOne({
       relations: [EntitiesType.ACCOUNT],
-      where: { email: req.email },
+      where: { id: req.user.id },
     })
 
     if (!user) {
@@ -47,18 +48,16 @@ export class AccountService {
         HttpResponseStatus.CONFLICT
       )
     }
-    const numberAccount =
-      user.id.slice(0, 4) +
-      Math.floor(100000 + Math.random() * 900000).toString()
 
     const newAccount = this.accountRepository.create({
-      accountNumber: numberAccount,
+      accountNumber: generateUniqueNumber(user.id),
       balance: initialBalance,
       owner: fullName(user),
       user,
     })
 
     const currentAccount = await this.accountRepository.save(newAccount)
+
     await this.movements.createLastMovement(
       { ...user, account: currentAccount },
       {
@@ -83,16 +82,12 @@ export class AccountService {
         typeMovement: TypeMovement.GIFT,
       }
     )
-    return HttpResponseSuccess(this.i18n.t('account.CREATE_ACCOUNT'), {
-      firstName: user?.first_name,
-      lastName: user?.last_name,
-      numberAccount,
-    })
+    return HttpResponseSuccess(this.i18n.t('account.CREATE_ACCOUNT'))
   }
 
   async getAccountUser(req) {
     const user = await this.accountRepository.findOne({
-      where: { user: req.id },
+      where: { user: { id: req.user.id } },
     })
 
     return HttpResponseSuccess(this.i18n.t('general.GET_SUCCESS'), user)
