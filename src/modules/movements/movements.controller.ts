@@ -30,4 +30,10 @@ export class MovementsController {
   ) {
     return this.movementService.getUserMovements(queryParams, req)
   }
+
+  @Get('/months')
+  @UseGuards(JwtAuthGuard)
+  async getAvailableMonths(@Req() req: Request) {
+    return this.movementService.getUserMovementMonths(req)
+  }
 }

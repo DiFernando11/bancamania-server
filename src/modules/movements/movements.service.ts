@@ -1,10 +1,4 @@
-import {
-  BadRequestException,
-  HttpException,
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { I18nService } from 'nestjs-i18n'
 import { Between, Equal, LessThanOrEqual, Repository } from 'typeorm'
@@ -12,6 +6,7 @@ import { HttpResponseStatus } from '@/src/common/constants'
 import {
   createFilterDate,
   createPaginationData,
+  formatDate,
   getTranslation,
   HttpResponseError,
   HttpResponseSuccess,
@@ -103,5 +98,40 @@ export class MovementsService {
     } catch (error) {
       return HttpResponseError(error.message)
     }
+  }
+
+  async getUserMovementMonths(req) {
+    console.log('mas motn', 'MONTHS')
+    const { accountId, debitCardId } = req.query
+
+    let query = this.movementRepository
+      .createQueryBuilder('movement')
+      .select([
+        `TO_CHAR(DATE_TRUNC('month', movement.createdAt), 'YYYY-MM-DD') as id`,
+      ])
+      .where('movement.userId = :userId', { userId: req.user.id })
+
+    if (accountId) {
+      query = query.andWhere('movement.accountId = :accountId', { accountId })
+    }
+
+    if (debitCardId) {
+      query = query.andWhere('movement.debitCardId = :debitCardId', {
+        debitCardId,
+      })
+    }
+
+    const months = await query
+      .groupBy(`TO_CHAR(DATE_TRUNC('month', movement.createdAt), 'YYYY-MM-DD')`)
+      .orderBy(`MAX(movement.createdAt)`, 'DESC')
+      .limit(12)
+      .getRawMany()
+
+    const formatMont = months.map((m) => ({
+      id: m.id,
+      text: formatDate(m.id, 'MMMM YYYY', req.i18nLang),
+    }))
+
+    return HttpResponseSuccess(null, formatMont)
   }
 }
