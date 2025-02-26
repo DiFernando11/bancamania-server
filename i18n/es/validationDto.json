@@ -1,7 +1,11 @@
 {
+  "ACCOUNT_ID_INVALID": "El ID de la cuenta debe ser un UUID válido.",
   "BALANCE_NUMBER": "El balance debe ser un número",
   "CODE_LENGTH": "El código debe tener exactamente 6 caracteres.",
   "CODE_REQUIRED": "El código de verificación es obligatorio.",
+  "DATE_FROM_INVALID": "La fecha 'desde' debe tener el formato YYYY-MM-DD o ISO8601.",
+  "DATE_TO_INVALID": "La fecha 'hasta' debe tener el formato YYYY-MM-DD o ISO8601.",
+  "DEBIT_CARD_ID_INVALID": "El ID de la tarjeta de débito debe ser un UUID válido.",
   "DESCRIPTION_REQUIRED": "La descripción es obligatoria",
   "DESCRIPTION_STRING": "La descripción debe ser una cadena de texto",
   "EMAIL_INVALID": "El formato del correo electrónico es incorrecto (ej. usuario@dominio.com).",
@@ -10,6 +14,9 @@
   "FIRSTNAME_STRING": "El nombre debe ser una cadena de texto.",
   "LASTNAME_REQUIRED": "El apellido es obligatorio.",
   "LASTNAME_STRING": "El apellido debe ser una cadena de texto.",
+  "LIMIT_NUMBER": "El límite debe ser un número entero.",
+  "PAGE_MIN": "La página no puede ser menor a 1.",
+  "PAGE_NUMBER": "La página debe ser un número entero.",
   "PASSWORD_LOWERCASE": "La contraseña debe contener al menos una letra minúscula.",
   "PASSWORD_MIN_LENGTH": "La contraseña debe tener al menos 8 caracteres.",
   "PASSWORD_NUMBER": "La contraseña debe contener al menos un número.",
@@ -25,6 +32,7 @@
   "TITLE_REQUIRED": "El título es obligatorio",
   "TITLE_STRING": "El título debe ser una cadena de texto",
   "TOKEN_REQUIRED": "El token es obligatorio.",
+  "TOTAL_BALANCE_NUMBER": "El balance debe ser un número",
   "TYPE_MOVEMENT_INVALID": "El tipo de movimiento debe ser Wallet o Transferencia",
   "VALIDATION_FAILED": "Validacion de errores detectada."
 }
