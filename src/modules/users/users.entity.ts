@@ -1,7 +1,6 @@
 import {
   Column,
   Entity,
-  JoinColumn,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -12,10 +11,10 @@ import { DebitCard } from '@/src/modules/tarjetas/debitCard/debitCard.entity'
 import { Account } from '../account/account.entity'
 
 @Entity()
-@Unique(['email', 'phone_number']) // Hacemos que el teléfono también sea único
+@Unique(['email', 'phone_number'])
 export class Usuario {
-  @PrimaryGeneratedColumn('uuid')
-  id: string
+  @PrimaryGeneratedColumn('increment')
+  id: number
 
   @Column({ nullable: true, unique: true })
   email: string

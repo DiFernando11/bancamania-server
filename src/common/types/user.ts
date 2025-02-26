@@ -16,5 +16,5 @@ export interface ClientUser {
   image?: string
   lastName?: string
   phone?: string
-  id: string
+  id: number
 }
