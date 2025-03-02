@@ -1,6 +1,8 @@
 {
   "CREATE_MOVE": "Movement successfully created",
+  "DETAIL_MOVEMENT": "DETAIL OF MOVEMENTS",
   "MOV_ACCOUNT_CREATE": "Savings account created on {date}",
   "MOV_DEBIT_CREATE": "Debit account created {date}",
-  "MOV_GIFT_BALANCE": "You’ve received a gift! Money has been deposited into your savings account."
+  "MOV_GIFT_BALANCE": "You’ve received a gift! Money has been deposited into your savings account.",
+  "STATEMENT": "STATEMENT"
 }

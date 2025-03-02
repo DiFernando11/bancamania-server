@@ -1,8 +1,11 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
+import { format, lastDayOfMonth, parse } from 'date-fns'
+import { Request } from 'express'
 import { I18nService } from 'nestjs-i18n'
-import { Between, Equal, LessThanOrEqual, Repository } from 'typeorm'
+import { Equal, Repository } from 'typeorm'
 import { HttpResponseStatus } from '@/src/common/constants'
+import { PromiseApiResponse } from '@/src/common/types'
 import {
   createFilterDate,
   createPaginationData,
@@ -12,9 +15,25 @@ import {
   HttpResponseSuccess,
   ThrowHttpException,
 } from '@/src/common/utils'
-import { CreateMovementDto } from '@/src/modules/movements/dto/create-movement.dto'
-import { GetUserMovementsDto } from '@/src/modules/movements/dto/get-user-movements.dto'
+import { EntitiesType } from '@/src/enum/entities.enum'
+import {
+  CreateMovementDto,
+  GenerateStatemensMovementsDto,
+  GetUserMovementsDto,
+} from '@/src/modules/movements/dto'
 import { Movement } from '@/src/modules/movements/movements.entity'
+import {
+  GetUserMovementsResponse,
+  Movements,
+} from '@/src/modules/movements/types'
+import { PdfService } from '@/src/modules/pdf/pdf.service'
+import {
+  headerTemplate,
+  htmlTemplate,
+  InfoBoxTemplate,
+  tableTemplate,
+} from '@/src/modules/pdf/template'
+import { tableCss } from '@/src/modules/pdf/template/css'
 import { Usuario } from '@/src/modules/users/users.entity'
 
 @Injectable()
@@ -24,7 +43,8 @@ export class MovementsService {
     private readonly movementRepository: Repository<Movement>,
     @InjectRepository(Usuario)
     private readonly userRepository: Repository<Usuario>,
-    private readonly i18n: I18nService
+    private readonly i18n: I18nService,
+    private readonly pdfService: PdfService
   ) {}
 
   async createLastMovement(user: Usuario, movementData: CreateMovementDto) {
@@ -57,7 +77,10 @@ export class MovementsService {
     return HttpResponseSuccess(this.i18n.t('movements.CREATE_MOVE'))
   }
 
-  async getUserMovements(queryParams: GetUserMovementsDto, req) {
+  async getUserMovements(
+    queryParams: GetUserMovementsDto,
+    req
+  ): PromiseApiResponse<GetUserMovementsResponse> {
     try {
       const { accountId, debitCardId, limit, page, fechaDesde, fechaHasta } =
         queryParams
@@ -78,7 +101,7 @@ export class MovementsService {
         },
         skip,
         take,
-        where: { user: { id: req.user.id }, ...filters },
+        where: filters,
       })
 
       const translatedMovements = movements.map((movement) => {
@@ -101,7 +124,6 @@ export class MovementsService {
   }
 
   async getUserMovementMonths(req) {
-    console.log('mas motn', 'MONTHS')
     const { accountId, debitCardId } = req.query
 
     let query = this.movementRepository
@@ -133,5 +155,79 @@ export class MovementsService {
     }))
 
     return HttpResponseSuccess(null, formatMont)
+  }
+
+  async getUserMovementsByMonth(
+    queryParams: GetUserMovementsDto,
+    req: Request
+  ): Promise<Movements[]> {
+    if (queryParams.fechaDesde) {
+      const fechaDesde = parse(queryParams.fechaDesde, 'yyyy-MM-dd', new Date())
+      queryParams.fechaHasta = format(lastDayOfMonth(fechaDesde), 'yyyy-MM-dd')
+    }
+    queryParams.limit = 0
+    const movimientos = await this.getUserMovements(queryParams, req)
+    return movimientos.data.movements
+  }
+
+  async generateStatementPdf(
+    queryParams: GenerateStatemensMovementsDto,
+    req
+  ): Promise<Buffer> {
+    const user = await this.userRepository.findOne({
+      relations: [EntitiesType.ACCOUNT],
+      where: { id: req.user.id },
+    })
+
+    if (!user || !user.account) {
+      ThrowHttpException(
+        this.i18n.t('general.USER_NOT_FOUND'),
+        HttpResponseStatus.NOT_FOUND
+      )
+    }
+
+    ;(queryParams as any).accountId = user.account.id
+
+    const movimientos = await this.getUserMovementsByMonth(queryParams, req)
+
+    const filasTabla = movimientos
+      .map(
+        (mov) => `
+          <tr>
+            <td>${formatDate(mov.createdAt, 'DD-MMM')}</td>
+            <td>${mov.id}</td>
+            <td>${mov.description}</td>
+            <td>${mov.balance}</td>
+            <td>${mov.totalBalance}</td>
+          </tr>
+        `
+      )
+      .join('')
+
+    const htmlContent = htmlTemplate({
+      content: ` <div class="container">
+    ${headerTemplate({ subtitle: this.i18n.t('movements.STATEMENT') })}
+    ${InfoBoxTemplate({
+      infoText: this.i18n.t('general.ACCOUNT_NUMBER', {
+        args: { number: user.account.accountNumber },
+      }),
+      infoTitle: user.account.owner.toUpperCase(),
+    })}
+    ${tableTemplate({
+      arrayTittles: [
+        this.i18n.t('general.DATE'),
+        this.i18n.t('general.N_DOC'),
+        this.i18n.t('general.DESCRIPTION'),
+        this.i18n.t('general.DEBIT'),
+        this.i18n.t('general.BALANCE'),
+      ],
+      contentTable: filasTabla,
+      title: this.i18n.t('movements.DETAIL_MOVEMENT'),
+    })}
+      </div>`,
+      style: tableCss,
+    })
+
+    return this.pdfService.generatePdfBuffer(htmlContent)
   }
 }

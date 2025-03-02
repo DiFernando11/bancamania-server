@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm'
 import { Usuario } from 'src/modules/users/users.entity'
 import { Movement } from '@/src/modules/movements/movements.entity'
 import { MovementsService } from '@/src/modules/movements/movements.service'
+import { PdfService } from '@/src/modules/pdf/pdf.service'
 import { DebitCardController } from '@/src/modules/tarjetas/debitCard/debitCard.controller'
 import { DebitCard } from '@/src/modules/tarjetas/debitCard/debitCard.entity'
 import { DebitCardService } from '@/src/modules/tarjetas/debitCard/debitCard.service'
@@ -31,6 +32,7 @@ import { JwtStrategy } from '@/src/strategies/jwt.strategy'
     UsersService,
     TarjetasService,
     MovementsService,
+    PdfService,
   ],
 })
 export class DebitCardModule {}

@@ -1,6 +1,9 @@
 {
   "CREATE_MOVE": "Movimiento creado con exito",
+  "DESCRIPCIÓN": "Descripción",
+  "DETAIL_MOVEMENT": "DETALLE DE MOVIMIENTOS",
   "MOV_ACCOUNT_CREATE": "Cuenta de ahorros creada {date}",
   "MOV_DEBIT_CREATE": "Cuenta de débito creada {date}",
-  "MOV_GIFT_BALANCE": "¡Tienes un regalo! Se ha depositado dinero en tu cuenta de ahorros."
+  "MOV_GIFT_BALANCE": "¡Tienes un regalo! Se ha depositado dinero en tu cuenta de ahorros.",
+  "STATEMENT": "ESTADO DE CUENTA"
 }
