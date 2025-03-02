@@ -8,6 +8,7 @@ import { Account } from '@/src/modules/account/account.entity'
 import { AccountService } from '@/src/modules/account/account.service'
 import { Movement } from '@/src/modules/movements/movements.entity'
 import { MovementsService } from '@/src/modules/movements/movements.service'
+import { PdfService } from '@/src/modules/pdf/pdf.service'
 import { UsersService } from '@/src/modules/users/users.service'
 import { JwtStrategy } from '../../strategies/jwt.strategy'
 
@@ -24,6 +25,12 @@ import { JwtStrategy } from '../../strategies/jwt.strategy'
     TypeOrmModule.forFeature([Usuario]),
     TypeOrmModule.forFeature([Movement]),
   ],
-  providers: [JwtStrategy, AccountService, UsersService, MovementsService],
+  providers: [
+    JwtStrategy,
+    AccountService,
+    UsersService,
+    MovementsService,
+    PdfService,
+  ],
 })
 export class AccountModule {}

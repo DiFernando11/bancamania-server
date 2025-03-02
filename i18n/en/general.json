@@ -1,6 +1,12 @@
 {
+  "ACCOUNT_NUMBER": "ACCOUNT: {number}",
+  "BALANCE": "BALANCE",
+  "DATE": "DATE",
+  "DEBIT": "DEBIT",
+  "DESCRIPTION": "DESCRIPTION",
   "GET_SUCCESS": "The consultation was carried out successfully",
   "MIN_LENGTH": "The field {field} must be at least {length} characters.",
+  "N_DOC": "N.DOC",
   "REQUIRED_FIELD": "The field {field} is required.",
   "USER_NOT_FOUND": "User not found",
   "VALIDATION_FAILED": "Validation errors detected."

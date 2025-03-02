@@ -1,6 +1,12 @@
 {
+  "ACCOUNT_NUMBER": "CUENTA: {number}",
+  "BALANCE": "SALDO",
+  "DATE": "FECHA",
+  "DEBIT": "DEBITO",
+  "DESCRIPTION": "DESCRIPCIÓN",
   "GET_SUCCESS": "La consulta se realizo de manera exitosa",
   "MIN_LENGTH": "El campo {field} debe tener al menos {length} caracteres.",
+  "N_DOC": "N.DOC",
   "REQUIRED_FIELD": "El campo {field} es obligatorio.",
   "USER_NOT_FOUND": "Usuario no encontrado",
   "VALIDATION_FAILED": "Errores de validación detectados."

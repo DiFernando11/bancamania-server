@@ -5,12 +5,17 @@ import {
   Post,
   Query,
   Req,
-  Request,
+  Res,
   UseGuards,
 } from '@nestjs/common'
+import { Request, Response } from 'express'
+import { formatDate } from '@/src/common/utils'
 import { JwtAuthGuard } from '@/src/guards/jwt-auth.guard'
-import { CreateMovementDto } from '@/src/modules/movements/dto/create-movement.dto'
-import { GetUserMovementsDto } from '@/src/modules/movements/dto/get-user-movements.dto'
+import {
+  CreateMovementDto,
+  GenerateStatemensMovementsDto,
+  GetUserMovementsDto,
+} from '@/src/modules/movements/dto'
 import { MovementsService } from '@/src/modules/movements/movements.service'
 
 @Controller('movements')
@@ -26,7 +31,7 @@ export class MovementsController {
   @UseGuards(JwtAuthGuard)
   async getUserMovements(
     @Query() queryParams: GetUserMovementsDto,
-    @Request() req
+    @Req() req
   ) {
     return this.movementService.getUserMovements(queryParams, req)
   }
@@ -35,5 +40,30 @@ export class MovementsController {
   @UseGuards(JwtAuthGuard)
   async getAvailableMonths(@Req() req: Request) {
     return this.movementService.getUserMovementMonths(req)
+  }
+
+  @Get('/pdf/statement')
+  @UseGuards(JwtAuthGuard)
+  async downloadPdf(
+    @Query() queryParams: GenerateStatemensMovementsDto,
+    @Req() req: Request,
+    @Res() res: Response
+  ): Promise<void> {
+    try {
+      const pdfBuffer = await this.movementService.generateStatementPdf(
+        queryParams,
+        req
+      )
+      res.setHeader('Content-Type', 'application/pdf')
+      res.setHeader(
+        'Content-Disposition',
+        `attachment; filename="statement-${formatDate(queryParams.fechaDesde, 'MMM-YYYY')}"`
+      )
+      res.end(pdfBuffer)
+    } catch (error) {
+      res
+        .status(500)
+        .json({ message: `Error al generar el PDF: ${error.message}` })
+    }
   }
 }
