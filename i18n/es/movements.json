@@ -5,5 +5,7 @@
   "MOV_ACCOUNT_CREATE": "Cuenta de ahorros creada {date}",
   "MOV_DEBIT_CREATE": "Cuenta de débito creada {date}",
   "MOV_GIFT_BALANCE": "¡Tienes un regalo! Se ha depositado dinero en tu cuenta de ahorros.",
+  "MOV_RECEIVE_TRANSFER": "Recibiste una transferencia de {balance} - {date}",
+  "MOV_SEND_TRANSFER": "Enviaste una transferencia de {balance} - {date}",
   "STATEMENT": "ESTADO DE CUENTA"
 }
