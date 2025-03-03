@@ -1,10 +1,12 @@
 {
   "ACCOUNT_EXISTS": "El usuario ya tiene una cuenta registrada",
+  "ACOUNT_ID_NOT_FOUND": "La cuenta seleccionada no existe",
   "CREATE_ACCOUNT": "La cuenta del usuario ha sido creada de manera exitosa",
   "DIFFERENT_ID_TRANSFER": "ID cuenta de origen debe ser diferente a ID cuenta destino",
   "FORBIDDEN_TRANSFER": "No eres el propietario de esta cuenta, comunicate con el banco si existe incovenientes.",
   "INSUFFICIENT_BALANCE": "Saldo insuficiente",
   "NOT_FOUND_ACCOUNT_DESTINE": "Cuenta destino no encontrada",
   "ORIGIN_ACCOUNT_ERROR": "Tenemos problemas con tu cuenta, por favor intentelo mas tarde",
+  "TRANSFER_FAILED": "Tuvimos problemas al realizar la transferencia, por favor intentelo mas tarde.",
   "TRANSFER_SUCCESS": "La transferencia se realizo de manera exitosa"
 }

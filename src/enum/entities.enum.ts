@@ -1,6 +1,6 @@
 export enum EntitiesType {
   ACCOUNT = 'account',
   DEBIT_CARD = 'debitCard',
-  USER = 'usuario',
+  USER = 'user',
   MOVEMENTS = 'movements',
 }

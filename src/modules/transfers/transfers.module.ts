@@ -4,9 +4,10 @@ import { JwtModule } from '@nestjs/jwt'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { Usuario } from 'src/modules/users/users.entity'
 import { Account } from '@/src/modules/account/account.entity'
+import { Movement } from '@/src/modules/movements/movements.entity'
+import { PdfService } from '@/src/modules/pdf/pdf.service'
 import { TransfersController } from '@/src/modules/transfers/transfers.controller'
 import { TransfersService } from '@/src/modules/transfers/transfers.service'
-import { UsersService } from '@/src/modules/users/users.service'
 import { JwtStrategy } from '@/src/strategies/jwt.strategy'
 
 @Module({
@@ -20,7 +21,8 @@ import { JwtStrategy } from '@/src/strategies/jwt.strategy'
     }),
     TypeOrmModule.forFeature([Usuario]),
     TypeOrmModule.forFeature([Account]),
+    TypeOrmModule.forFeature([Movement]),
   ],
-  providers: [JwtStrategy, UsersService, TransfersService],
+  providers: [JwtStrategy, PdfService, TransfersService],
 })
 export class TransfersModule {}
