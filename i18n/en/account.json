@@ -1,4 +1,10 @@
 {
   "ACCOUNT_EXISTS": "The user already has a registered account",
-  "CREATE_ACCOUNT": "The user account has been created successfully"
+  "CREATE_ACCOUNT": "The user account has been created successfully",
+  "DIFFERENT_ID_TRANSFER": "Source account ID must be different from destination account ID",
+  "FORBIDDEN_TRANSFER": "You are not the owner of this account, please contact the bank if there are any issues.",
+  "INSUFFICIENT_BALANCE": "Insufficient balance",
+  "NOT_FOUND_ACCOUNT_DESTINE": "Destination account not found",
+  "ORIGIN_ACCOUNT_ERROR": "We are having trouble with your account, please try again later.",
+  "TRANSFER_SUCCESS": "The transfer was carried out successfully"
 }

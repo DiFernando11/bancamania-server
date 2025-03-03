@@ -71,7 +71,10 @@ export class DebitCardService {
       }
     )
 
-    return HttpResponseSuccess(this.i18n.t('tarjetas.CREATE_DEBIT'))
+    return HttpResponseSuccess(
+      this.i18n.t('tarjetas.CREATE_DEBIT'),
+      HttpResponseStatus.CREATED
+    )
   }
 
   async getCardDebit(req) {
