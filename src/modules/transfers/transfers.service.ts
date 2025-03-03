@@ -9,6 +9,7 @@ import {
   saveTranslation,
   ThrowHttpException,
 } from '@/src/common/utils'
+import { EntitiesType } from '@/src/enum/entities.enum'
 import { Account } from '@/src/modules/account/account.entity'
 import { TypeMovement } from '@/src/modules/movements/enum/type-movement.enum'
 import { Movement } from '@/src/modules/movements/movements.entity'
@@ -21,6 +22,27 @@ export class TransfersService {
     private readonly accountRepository: Repository<Account>,
     private readonly i18n: I18nService
   ) {}
+
+  async verifyAccount({ accountId }) {
+    const account = await this.accountRepository.findOne({
+      relations: [EntitiesType.USER],
+      where: { id: accountId },
+    })
+
+    if (!account) {
+      ThrowHttpException(
+        this.i18n.t('account.ACOUNT_ID_NOT_FOUND'),
+        HttpResponseStatus.NOT_FOUND
+      )
+    }
+
+    return HttpResponseSuccess(this.i18n.t('general.GET_SUCCESS'), {
+      accountNumber: account.accountNumber,
+      email: account.user.email,
+      id: account.id,
+      owner: account.owner,
+    })
+  }
 
   async transferFunds(req, transferDto: TransferDto) {
     const account = await this.accountRepository.findOne({
