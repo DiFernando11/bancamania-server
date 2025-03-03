@@ -84,7 +84,10 @@ export class AccountService {
         typeMovement: TypeMovement.GIFT,
       }
     )
-    return HttpResponseSuccess(this.i18n.t('account.CREATE_ACCOUNT'))
+    return HttpResponseSuccess(
+      this.i18n.t('account.CREATE_ACCOUNT'),
+      HttpResponseStatus.CREATED
+    )
   }
 
   async getAccountUser(req) {
