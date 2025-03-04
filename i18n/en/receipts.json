@@ -1,0 +1,12 @@
+{
+  "NOT_FOUND": "Receipt not found",
+  "accountDestine": "Destination Account",
+  "accountNumber": "Account Number",
+  "amount": "Amount",
+  "date": "Date: {date}",
+  "name": "Name",
+  "originAccount": "Origin Account",
+  "owner": "Owner",
+  "receipt": "Receipt {rec}",
+  "titleTransfer": "Transfer successful"
+}
