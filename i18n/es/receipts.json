@@ -1,0 +1,12 @@
+{
+  "NOT_FOUND": "Comprobante no encontrado",
+  "accountDestine": "Cuenta destino",
+  "accountNumber": "Número de cuenta",
+  "amount": "Monto",
+  "date": "Fecha: {date}",
+  "name": "Nombre",
+  "originAccount": "Cuenta origen",
+  "owner": "Propietario",
+  "receipt": "Comprobante {rec}",
+  "titleTransfer": "Transferencia exitosa"
+}

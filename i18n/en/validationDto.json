@@ -1,5 +1,6 @@
 {
   "ACCOUNT_ID_INVALID": "The account ID must be a valid UUID.",
+  "ACCOUNT_ID_REQUIRED": "The accountId is required.",
   "AMOUNT_MIN": "The amount must be greater than 0",
   "AMOUNT_NUMBER": "The amount must be a valid number.",
   "AMOUNT_REQUIRED": "The amount is required.",
