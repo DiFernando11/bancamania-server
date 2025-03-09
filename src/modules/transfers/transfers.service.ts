@@ -146,6 +146,14 @@ export class TransfersService {
             .getRepository(Receipt)
             .save({
               dataReceipts: [
+                ...(transferDto.motive
+                  ? [
+                      {
+                        key: 'reason',
+                        value: transferDto.motive,
+                      },
+                    ]
+                  : []),
                 {
                   key: 'amount',
                   style: {
