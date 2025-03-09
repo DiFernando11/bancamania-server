@@ -97,4 +97,25 @@ export class AccountService {
 
     return HttpResponseSuccess(this.i18n.t('general.GET_SUCCESS'), user)
   }
+
+  async verifyAccount({ accountNumber }: { accountNumber: string }) {
+    const account = await this.accountRepository.findOne({
+      relations: [EntitiesType.USER],
+      where: { accountNumber },
+    })
+
+    if (!account) {
+      ThrowHttpException(
+        this.i18n.t('account.ACOUNT_ID_NOT_FOUND'),
+        HttpResponseStatus.NOT_FOUND
+      )
+    }
+
+    return HttpResponseSuccess(this.i18n.t('general.GET_SUCCESS'), {
+      accountNumber: account.accountNumber,
+      email: account.user.email,
+      id: account.id,
+      owner: account.owner,
+    })
+  }
 }

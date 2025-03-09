@@ -1,6 +1,16 @@
-import { Controller, Get, HttpCode, Post, Req, UseGuards } from '@nestjs/common'
+import {
+  Controller,
+  Get,
+  HttpCode,
+  Param,
+  Post,
+  Req,
+  UseGuards,
+  ValidationPipe,
+} from '@nestjs/common'
 import { Request } from 'express'
 import { AccountService } from '@/src/modules/account/account.service'
+import { VerifyAccountDto } from '@/src/modules/account/dto/verifyAccount.dto'
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard'
 
 @Controller('account')
@@ -17,5 +27,12 @@ export class AccountController {
   @UseGuards(JwtAuthGuard)
   async getAccountUser(@Req() req: Request) {
     return this.accountService.getAccountUser(req)
+  }
+
+  @Get('/:accountNumber')
+  @HttpCode(200)
+  @UseGuards(JwtAuthGuard)
+  async verifyAccount(@Param(ValidationPipe) params: VerifyAccountDto) {
+    return this.accountService.verifyAccount(params)
   }
 }

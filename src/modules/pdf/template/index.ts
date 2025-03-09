@@ -1,4 +1,7 @@
+export * from './dataReceiptsTemplate'
+export * from './headerReceipts'
 export * from './headerTemplate'
 export * from './htmlTemplate'
 export * from './infoBoxTemplate'
+export * from './receiptsTemplate'
 export * from './tableTemplate'

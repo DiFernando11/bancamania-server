@@ -9,10 +9,10 @@ import {
   saveTranslation,
   ThrowHttpException,
 } from '@/src/common/utils'
-import { EntitiesType } from '@/src/enum/entities.enum'
 import { Account } from '@/src/modules/account/account.entity'
 import { TypeMovement } from '@/src/modules/movements/enum/type-movement.enum'
 import { Movement } from '@/src/modules/movements/movements.entity'
+import { Receipt } from '@/src/modules/receipts/receipts.entity'
 import { TransferDto } from '@/src/modules/transfers/dto/createTransfer.dto'
 
 @Injectable()
@@ -22,27 +22,6 @@ export class TransfersService {
     private readonly accountRepository: Repository<Account>,
     private readonly i18n: I18nService
   ) {}
-
-  async verifyAccount({ accountId }) {
-    const account = await this.accountRepository.findOne({
-      relations: [EntitiesType.USER],
-      where: { id: accountId },
-    })
-
-    if (!account) {
-      ThrowHttpException(
-        this.i18n.t('account.ACOUNT_ID_NOT_FOUND'),
-        HttpResponseStatus.NOT_FOUND
-      )
-    }
-
-    return HttpResponseSuccess(this.i18n.t('general.GET_SUCCESS'), {
-      accountNumber: account.accountNumber,
-      email: account.user.email,
-      id: account.id,
-      owner: account.owner,
-    })
-  }
 
   async transferFunds(req, transferDto: TransferDto) {
     const account = await this.accountRepository.findOne({
@@ -73,9 +52,15 @@ export class TransfersService {
       ThrowHttpException(this.i18n.t('account.DIFFERENT_ID_TRANSFER'))
     }
 
-    await this.executeTransferTransaction(req, transferDto, account)
+    const receipt = await this.executeTransferTransaction(
+      req,
+      transferDto,
+      account
+    )
 
-    return HttpResponseSuccess(this.i18n.t('account.TRANSFER_SUCCESS'))
+    return HttpResponseSuccess(this.i18n.t('account.TRANSFER_SUCCESS'), {
+      receiptId: receipt.id,
+    })
   }
 
   private async executeTransferTransaction(
@@ -83,7 +68,7 @@ export class TransfersService {
     transferDto: TransferDto,
     account: Account
   ) {
-    await this.accountRepository.manager.transaction(
+    return await this.accountRepository.manager.transaction(
       async (transactionalEntityManager) => {
         try {
           const amountDecimal = parseFloat(transferDto.amount.toFixed(2))
@@ -156,6 +141,46 @@ export class TransfersService {
             typeMovement: TypeMovement.WALLET,
             user: { id: userId },
           })
+
+          const receipt = await transactionalEntityManager
+            .getRepository(Receipt)
+            .save({
+              dataReceipts: [
+                {
+                  key: 'amount',
+                  style: {
+                    hr: true,
+                  },
+                  value: amountDecimal.toString(),
+                },
+                { key: 'originAccount' },
+                { key: 'name', value: account.owner },
+                {
+                  key: 'accountNumber',
+                  style: {
+                    hr: true,
+                  },
+                  value: account.accountNumber,
+                },
+                { key: 'accountDestine' },
+                { key: 'name', value: dataDestination.owner },
+                {
+                  key: 'accountNumber',
+                  value: dataDestination.accountNumber,
+                },
+              ],
+              description: saveTranslation({
+                args: {
+                  balance: amountDecimal,
+                  date: formatDate(new Date(), 'DD MMM'),
+                },
+                key: 'movements.MOV_SEND_TRANSFER',
+              }),
+              title: 'titleTransfer',
+              user: { id: req.user.id },
+            })
+
+          return receipt
         } catch (error) {
           ThrowHttpException(
             this.i18n.t('account.TRANSFER_FAILED'),
