@@ -1,5 +1,6 @@
 {
   "10_DIGITS_NUMERIC": "Debe tener 10 caracteres numericos",
+  "24_MAX_LENGTH": "El campo no puede tener mas de 24 caracteres",
   "ACCOUNT_ID_INVALID": "El ID de la cuenta debe ser un UUID válido.",
   "ACCOUNT_ID_REQUIRED": "El accountId es requerido.",
   "AMOUNT_MIN": "El monto debe ser mayor que 0",
