@@ -3,7 +3,7 @@ import { IsNotEmpty, IsNumber, IsUUID, Min } from 'class-validator'
 export class TransferDto {
   @IsNotEmpty({ message: 'AMOUNT_REQUIRED' })
   @IsNumber({}, { message: 'AMOUNT_NUMBER' })
-  @Min(1, { message: 'AMOUNT_MIN' })
+  @Min(0.01, { message: 'AMOUNT_MIN' })
   amount: number
 
   @IsNotEmpty({ message: 'DESTINATION_ACCOUNT_REQUIRED' })

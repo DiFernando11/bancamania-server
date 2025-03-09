@@ -1,4 +1,5 @@
 {
+  "10_DIGITS_NUMERIC": "Must have 10 numeric characters",
   "ACCOUNT_ID_INVALID": "The account ID must be a valid UUID.",
   "ACCOUNT_ID_REQUIRED": "The accountId is required.",
   "AMOUNT_MIN": "The amount must be greater than 0",
@@ -17,6 +18,7 @@
   "EMAIL_REQUIRED": "The email is required.",
   "FIRSTNAME_REQUIRED": "The first name is required.",
   "FIRSTNAME_STRING": "The first name must be a string.",
+  "IS_STRING": "The field must be a string",
   "LASTNAME_REQUIRED": "The last name is required.",
   "LASTNAME_STRING": "The last name must be a string.",
   "LIMIT_NUMBER": "The limit must be an integer.",

@@ -1,4 +1,5 @@
 {
+  "10_DIGITS_NUMERIC": "Debe tener 10 caracteres numericos",
   "ACCOUNT_ID_INVALID": "El ID de la cuenta debe ser un UUID válido.",
   "ACCOUNT_ID_REQUIRED": "El accountId es requerido.",
   "AMOUNT_MIN": "El monto debe ser mayor que 0",
@@ -17,6 +18,7 @@
   "EMAIL_REQUIRED": "El correo electrónico es obligatorio.",
   "FIRSTNAME_REQUIRED": "El nombre es obligatorio.",
   "FIRSTNAME_STRING": "El nombre debe ser una cadena de texto.",
+  "IS_STRING": "El campo debe ser un string",
   "LASTNAME_REQUIRED": "El apellido es obligatorio.",
   "LASTNAME_STRING": "El apellido debe ser una cadena de texto.",
   "LIMIT_NUMBER": "El límite debe ser un número entero.",
