@@ -3,9 +3,9 @@ import { ConfigService } from '@nestjs/config'
 import { JwtModule } from '@nestjs/jwt'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { Usuario } from 'src/modules/users/users.entity'
-import { AccountController } from '@/src/modules/account/account.controller'
 import { Account } from '@/src/modules/account/account.entity'
 import { AccountService } from '@/src/modules/account/account.service'
+import { ContactAccountController } from '@/src/modules/contacts/contactAccounts..controller'
 import { ContactAccountsService } from '@/src/modules/contacts/contactAccounts..service'
 import { ContactAccount } from '@/src/modules/contacts/contactAccounts.entity'
 import { Movement } from '@/src/modules/movements/movements.entity'
@@ -15,7 +15,7 @@ import { UsersService } from '@/src/modules/users/users.service'
 import { JwtStrategy } from '../../strategies/jwt.strategy'
 
 @Module({
-  controllers: [AccountController],
+  controllers: [ContactAccountController],
   imports: [
     JwtModule.registerAsync({
       inject: [ConfigService],
@@ -33,8 +33,8 @@ import { JwtStrategy } from '../../strategies/jwt.strategy'
     AccountService,
     UsersService,
     MovementsService,
-    PdfService,
     ContactAccountsService,
+    PdfService,
   ],
 })
-export class AccountModule {}
+export class ContactAccountsModule {}

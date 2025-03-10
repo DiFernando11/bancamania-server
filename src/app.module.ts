@@ -4,6 +4,7 @@ import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm'
 import { CookieResolver, I18nModule } from 'nestjs-i18n'
 import * as path from 'path'
 import { AccountModule } from '@/src/modules/account/account.module'
+import { ContactAccountsModule } from '@/src/modules/contacts/contactAccounts..module'
 import { MovementsModule } from '@/src/modules/movements/movements.module'
 import { PdfModule } from '@/src/modules/pdf/pdf.module'
 import { ReceiptsModule } from '@/src/modules/receipts/receipts.module'
@@ -38,6 +39,7 @@ import { WhatsappModule } from './modules/whatsapp/whatsapp.module'
     PdfModule,
     TransfersModule,
     ReceiptsModule,
+    ContactAccountsModule,
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

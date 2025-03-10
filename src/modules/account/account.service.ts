@@ -12,6 +12,8 @@ import {
   ThrowHttpException,
 } from '@/src/common/utils'
 import { EntitiesType } from '@/src/enum/entities.enum'
+import { VerifyAccountDto } from '@/src/modules/account/dto/verifyAccount.dto'
+import { ContactAccount } from '@/src/modules/contacts/contactAccounts.entity'
 import { TypeMovement } from '@/src/modules/movements/enum/type-movement.enum'
 import { MovementsService } from '@/src/modules/movements/movements.service'
 import { Usuario } from '@/src/modules/users/users.entity'
@@ -24,6 +26,8 @@ export class AccountService {
     private readonly accountRepository: Repository<Account>,
     @InjectRepository(Usuario)
     private readonly userRepository: Repository<Usuario>,
+    @InjectRepository(ContactAccount)
+    private readonly contactAccountRepository: Repository<ContactAccount>,
     private readonly i18n: I18nService,
     private readonly movements: MovementsService
   ) {}
@@ -98,10 +102,10 @@ export class AccountService {
     return HttpResponseSuccess(this.i18n.t('general.GET_SUCCESS'), user)
   }
 
-  async verifyAccount({ accountNumber }: { accountNumber: string }) {
+  async verifyAccount(params: VerifyAccountDto, req) {
     const account = await this.accountRepository.findOne({
       relations: [EntitiesType.USER],
-      where: { accountNumber },
+      where: { accountNumber: params.accountNumber },
     })
 
     if (!account) {
@@ -111,10 +115,22 @@ export class AccountService {
       )
     }
 
+    if (account.user.id === req.user.id) {
+      ThrowHttpException(
+        this.i18n.t('account.TRANSFER_YOUR_SELF'),
+        HttpResponseStatus.NOT_FOUND
+      )
+    }
+
+    const isAddContact = await this.contactAccountRepository.findOne({
+      where: { account: { id: account.id }, user: { id: req.user.id } },
+    })
+
     return HttpResponseSuccess(this.i18n.t('general.GET_SUCCESS'), {
       accountNumber: account.accountNumber,
       email: account.user.email,
       id: account.id,
+      isAddContact: Boolean(isAddContact),
       owner: account.owner,
     })
   }

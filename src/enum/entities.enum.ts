@@ -3,4 +3,5 @@ export enum EntitiesType {
   DEBIT_CARD = 'debitCard',
   USER = 'user',
   MOVEMENTS = 'movements',
+  CONTACT_ACCOUNT = 'contactAccount',
 }

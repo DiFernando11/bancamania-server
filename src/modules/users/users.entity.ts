@@ -6,6 +6,7 @@ import {
   PrimaryGeneratedColumn,
   Unique,
 } from 'typeorm'
+import { ContactAccount } from '@/src/modules/contacts/contactAccounts.entity'
 import { Movement } from '@/src/modules/movements/movements.entity'
 import { DebitCard } from '@/src/modules/tarjetas/debitCard/debitCard.entity'
 import { Account } from '../account/account.entity'
@@ -48,4 +49,7 @@ export class Usuario {
 
   @OneToMany(() => Movement, (movement) => movement.user)
   movements: Movement[]
+
+  @OneToMany(() => ContactAccount, (contactAccount) => contactAccount.user)
+  contactAccount: ContactAccount[]
 }
