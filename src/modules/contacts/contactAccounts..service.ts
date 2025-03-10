@@ -61,7 +61,6 @@ export class ContactAccountsService {
     })
 
     await this.contactAccountRepository.save(newContact)
-    await new Promise((resolve) => setTimeout(resolve, 5000))
 
     return HttpResponseSuccess(
       this.i18n.t('contact.CREATE_CONTACT_SUCCESS'),
