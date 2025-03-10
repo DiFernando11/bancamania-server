@@ -32,7 +32,10 @@ export class AccountController {
   @Get('/:accountNumber')
   @HttpCode(200)
   @UseGuards(JwtAuthGuard)
-  async verifyAccount(@Param(ValidationPipe) params: VerifyAccountDto) {
-    return this.accountService.verifyAccount(params)
+  async verifyAccount(
+    @Param(ValidationPipe) params: VerifyAccountDto,
+    @Req() req: Request
+  ) {
+    return this.accountService.verifyAccount(params, req)
   }
 }

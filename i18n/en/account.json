@@ -8,5 +8,6 @@
   "NOT_FOUND_ACCOUNT_DESTINE": "Destination account not found",
   "ORIGIN_ACCOUNT_ERROR": "We are having trouble with your account, please try again later.",
   "TRANSFER_FAILED": "We had problems making the transfer, please try again later.",
-  "TRANSFER_SUCCESS": "The transfer was carried out successfully"
+  "TRANSFER_SUCCESS": "The transfer was carried out successfully",
+  "TRANSFER_YOUR_SELF": "It is not possible to make a transfer to the same account."
 }

@@ -8,5 +8,6 @@
   "NOT_FOUND_ACCOUNT_DESTINE": "Cuenta destino no encontrada",
   "ORIGIN_ACCOUNT_ERROR": "Tenemos problemas con tu cuenta, por favor intentelo mas tarde",
   "TRANSFER_FAILED": "Tuvimos problemas al realizar la transferencia, por favor intentelo mas tarde.",
-  "TRANSFER_SUCCESS": "La transferencia se realizo de manera exitosa"
+  "TRANSFER_SUCCESS": "La transferencia se realizo de manera exitosa",
+  "TRANSFER_YOUR_SELF": "No es posible realizar una transferencia a la misma cuenta."
 }

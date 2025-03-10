@@ -7,6 +7,7 @@
   "name": "Nombre",
   "originAccount": "Cuenta origen",
   "owner": "Propietario",
+  "reason": "Motivo",
   "receipt": "Comprobante {rec}",
   "titleTransfer": "Transferencia exitosa"
 }

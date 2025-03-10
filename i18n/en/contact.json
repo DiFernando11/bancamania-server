@@ -1,0 +1,5 @@
+{
+  "CONTACT_EXIST": "You have already added this account to your contacts list.",
+  "CREATE_CONTACT_SUCCESS": "The account has been saved in your contacts list",
+  "SELF_EMPLOYED": "You cannot save your own account to your contact list"
+}
