@@ -128,6 +128,7 @@ export class AccountService {
 
     return HttpResponseSuccess(this.i18n.t('general.GET_SUCCESS'), {
       accountNumber: account.accountNumber,
+      alias: isAddContact?.alias,
       email: account.user.email,
       id: account.id,
       isAddContact: Boolean(isAddContact),

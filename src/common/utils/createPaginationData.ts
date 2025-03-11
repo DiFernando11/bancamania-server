@@ -5,7 +5,7 @@ export const createPaginationData = ({ page = 1, limit = 10 }) => {
 
   return {
     createResponse: (total: number) => {
-      const totalPages = take === 0 ? 1 : Math.ceil(total / take)
+      const totalPages = take === 0 || total === 0 ? 1 : Math.ceil(total / take)
       const isLastPage = currentPage === totalPages
       return {
         currentPage,
