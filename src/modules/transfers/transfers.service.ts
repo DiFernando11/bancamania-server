@@ -87,7 +87,6 @@ export class TransfersService {
             ThrowHttpException(this.i18n.t('account.ORIGIN_ACCOUNT_ERROR'))
           }
 
-          // 🔹 Actualizamos la cuenta de destino
           const destinationResult = await transactionalEntityManager
             .createQueryBuilder()
             .update(Account)
@@ -120,7 +119,7 @@ export class TransfersService {
             }),
             title: dataDestination?.owner,
             totalBalance: newOriginBalance,
-            typeMovement: TypeMovement.WALLET,
+            typeMovement: TypeMovement.TRANSFER,
             user: { id: req.user.id },
           })
 
@@ -138,7 +137,7 @@ export class TransfersService {
             }),
             title: account.owner,
             totalBalance: newDestinationBalance,
-            typeMovement: TypeMovement.WALLET,
+            typeMovement: TypeMovement.TRANSFER,
             user: { id: userId },
           })
 
