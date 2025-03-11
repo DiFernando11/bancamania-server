@@ -1,6 +1,6 @@
 export enum TypeMovement {
   WALLET = 'Wallet',
-  TRANSFER = 'Transfer',
+  TRANSFER = 'Transfers',
   CARD = 'Card',
   GIFT = 'Gift',
 }
