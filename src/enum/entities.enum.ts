@@ -4,4 +4,5 @@ export enum EntitiesType {
   USER = 'user',
   MOVEMENTS = 'movements',
   CONTACT_ACCOUNT = 'contactAccount',
+  RS_USER_ACCOUNT = 'account.user',
 }

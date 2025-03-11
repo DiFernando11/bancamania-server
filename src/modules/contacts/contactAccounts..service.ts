@@ -1,9 +1,13 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { I18nService } from 'nestjs-i18n'
-import { Repository } from 'typeorm'
+import { ILike, Repository } from 'typeorm'
 import { HttpResponseStatus } from '@/src/common/constants'
-import { HttpResponseSuccess, ThrowHttpException } from '@/src/common/utils'
+import {
+  createPaginationData,
+  HttpResponseSuccess,
+  ThrowHttpException,
+} from '@/src/common/utils'
 import { EntitiesType } from '@/src/enum/entities.enum'
 import { Account } from '@/src/modules/account/account.entity'
 import { ContactAccount } from '@/src/modules/contacts/contactAccounts.entity'
@@ -67,5 +71,46 @@ export class ContactAccountsService {
       { alias, id: newContact.id },
       HttpResponseStatus.CREATED
     )
+  }
+
+  async getDataAccounts(req, page, limit, search) {
+    const { skip, take, createResponse } = createPaginationData({
+      limit,
+      page,
+    })
+
+    let whereCondition: any = { user: { id: req.user.id } }
+    if (search) {
+      whereCondition = [
+        { alias: ILike(`%${search}%`), user: { id: req.user.id } },
+        {
+          account: { accountNumber: ILike(`%${search}%`) },
+          user: { id: req.user.id },
+        },
+      ]
+    }
+
+    const [contacts, total] = await this.contactAccountRepository.findAndCount({
+      order: { alias: 'ASC' },
+      relations: [EntitiesType.ACCOUNT, EntitiesType.RS_USER_ACCOUNT],
+      select: {
+        account: {
+          accountNumber: true,
+          id: true,
+          owner: true,
+          user: { email: true },
+        },
+        alias: true,
+        id: true,
+      },
+      skip,
+      take,
+      where: whereCondition,
+    })
+
+    return HttpResponseSuccess(this.i18n.t('general.GET_SUCCESS'), {
+      ...createResponse(total),
+      contacts,
+    })
   }
 }
