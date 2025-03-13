@@ -1,4 +1,6 @@
 {
   "CREATE_DEBIT": "Se asigna la tarjeta de debito al usuario de manera exitosa",
-  "DEBIT_EXISTS": "El usuario ya tiene una tarjeta de debito registrada."
+  "DEBIT_EXISTS": "El usuario ya tiene una tarjeta de debito registrada.",
+  "DEBIT_NOT_FOUND": "No se pudo encontrar la tarjeta de débito",
+  "STATUS_UPDATED": "Estado de la tarjeta se ha modificado con exito"
 }

@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Req, UseGuards } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Put,
+  Req,
+  UseGuards,
+} from '@nestjs/common'
 import { Request } from 'express'
 import { JwtAuthGuard } from '@/src/guards/jwt-auth.guard'
 import { DebitCardService } from '@/src/modules/tarjetas/debitCard/debitCard.service'
@@ -16,5 +24,11 @@ export class DebitCardController {
   @UseGuards(JwtAuthGuard)
   async getCardDebit(@Req() req: Request) {
     return this.debitCardService.getCardDebit(req)
+  }
+
+  @Put('debit/status')
+  @UseGuards(JwtAuthGuard)
+  async updateStatus(@Req() req: Request) {
+    return this.debitCardService.updateDebitCardStatus(req)
   }
 }

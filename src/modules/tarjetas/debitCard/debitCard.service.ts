@@ -14,6 +14,7 @@ import {
 import { EntitiesType } from '@/src/enum/entities.enum'
 import { TypeMovement } from '@/src/modules/movements/enum/type-movement.enum'
 import { MovementsService } from '@/src/modules/movements/movements.service'
+import { DebitCardStatus } from '@/src/modules/tarjetas/debitCard/enum/DebitCardStatus'
 import { TarjetasService } from '@/src/modules/tarjetas/tarjetas.service'
 import { Usuario } from '@/src/modules/users/users.entity'
 import { DebitCard } from './debitCard.entity'
@@ -83,5 +84,32 @@ export class DebitCardService {
     })
 
     return HttpResponseSuccess(this.i18n.t('general.GET_SUCCESS'), debitCard)
+  }
+
+  async updateDebitCardStatus(req) {
+    const debitCard = await this.debitCardRepository.findOne({
+      where: { user: { id: req.user.id } },
+    })
+
+    if (!debitCard) {
+      ThrowHttpException(
+        this.i18n.t('tarjetas.DEBIT_NOT_FOUND'),
+        HttpResponseStatus.NOT_FOUND
+      )
+    }
+
+    const nextStatus: Record<DebitCardStatus, DebitCardStatus> = {
+      [DebitCardStatus.INACTIVE]: DebitCardStatus.ACTIVE,
+      [DebitCardStatus.ACTIVE]: DebitCardStatus.BLOCKED,
+      [DebitCardStatus.BLOCKED]: DebitCardStatus.ACTIVE,
+    }
+    const newStatus = nextStatus[debitCard.status]
+    debitCard.status = newStatus
+    await this.debitCardRepository.save(debitCard)
+    return HttpResponseSuccess(
+      this.i18n.t('tarjetas.STATUS_UPDATED'),
+      { newStatus },
+      HttpResponseStatus.OK
+    )
   }
 }
