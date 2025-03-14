@@ -1,6 +1,8 @@
 {
+  "CREATE_CREDIT": "The credit card is assigned to the user successfully",
   "CREATE_DEBIT": "The debit card is assigned to the user successfully",
-  "DEBIT_EXISTS": "The user already has a registered debit card.",
+  "CREDIT_EXISTS": "The user already has a registered debit card.",
+  "DEBIT_EXISTS": "The user already has a registered credit card.",
   "DEBIT_NOT_FOUND": "The debit card could not be found.",
   "STATUS_UPDATED": "Card status has been successfully changed."
 }

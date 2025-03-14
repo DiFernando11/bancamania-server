@@ -8,6 +8,7 @@ import {
 } from 'typeorm'
 import { ContactAccount } from '@/src/modules/contacts/contactAccounts.entity'
 import { Movement } from '@/src/modules/movements/movements.entity'
+import { CreditCard } from '@/src/modules/tarjetas/creditCard/creditCard.entity'
 import { DebitCard } from '@/src/modules/tarjetas/debitCard/debitCard.entity'
 import { Account } from '../account/account.entity'
 
@@ -46,6 +47,9 @@ export class Usuario {
 
   @OneToOne(() => DebitCard, (debitCard) => debitCard.user)
   debitCard: DebitCard
+
+  @OneToOne(() => CreditCard, (creditCard) => creditCard.user)
+  creditCard: CreditCard
 
   @OneToMany(() => Movement, (movement) => movement.user)
   movements: Movement[]

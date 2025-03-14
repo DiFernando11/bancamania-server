@@ -8,6 +8,7 @@ import {
 } from 'typeorm'
 import { Account } from '@/src/modules/account/account.entity'
 import { TypeMovement } from '@/src/modules/movements/enum/type-movement.enum'
+import { CreditCard } from '@/src/modules/tarjetas/creditCard/creditCard.entity'
 import { DebitCard } from '@/src/modules/tarjetas/debitCard/debitCard.entity'
 import { Usuario } from '@/src/modules/users/users.entity'
 
@@ -45,4 +46,8 @@ export class Movement {
   @ManyToOne(() => DebitCard, { nullable: true, onDelete: 'CASCADE' })
   @JoinColumn()
   debitCard?: DebitCard
+
+  @ManyToOne(() => CreditCard, { nullable: true, onDelete: 'CASCADE' })
+  @JoinColumn()
+  creditCard?: CreditCard
 }
