@@ -48,8 +48,8 @@ export class Usuario {
   @OneToOne(() => DebitCard, (debitCard) => debitCard.user)
   debitCard: DebitCard
 
-  @OneToOne(() => CreditCard, (creditCard) => creditCard.user)
-  creditCard: CreditCard
+  @OneToMany(() => CreditCard, (creditCard) => creditCard.user)
+  creditCards: CreditCard[]
 
   @OneToMany(() => Movement, (movement) => movement.user)
   movements: Movement[]

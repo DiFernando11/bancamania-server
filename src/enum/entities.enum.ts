@@ -1,7 +1,7 @@
 export enum EntitiesType {
   ACCOUNT = 'account',
   DEBIT_CARD = 'debitCard',
-  CREDIT_CARD = 'creditCard',
+  CREDIT_CARD = 'creditCards',
   USER = 'user',
   MOVEMENTS = 'movements',
   CONTACT_ACCOUNT = 'contactAccount',
