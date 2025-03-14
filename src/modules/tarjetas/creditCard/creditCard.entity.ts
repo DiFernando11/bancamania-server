@@ -1,9 +1,8 @@
 import {
   Column,
   Entity,
-  JoinColumn,
+  ManyToOne,
   OneToMany,
-  OneToOne,
   PrimaryGeneratedColumn,
   Unique,
 } from 'typeorm'
@@ -36,8 +35,7 @@ export class CreditCard {
   @Column({ default: DebitCardStatus.INACTIVE, nullable: false })
   status: DebitCardStatus
 
-  @OneToOne(() => Usuario, { onDelete: 'CASCADE' })
-  @JoinColumn()
+  @ManyToOne(() => Usuario, (user) => user.creditCards, { onDelete: 'CASCADE' })
   user: Usuario
 
   @OneToMany(() => Movement, (movement) => movement.creditCard)
