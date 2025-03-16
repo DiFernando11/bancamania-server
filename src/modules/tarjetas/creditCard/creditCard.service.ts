@@ -93,4 +93,15 @@ export class CreditCardService {
       HttpResponseStatus.CREATED
     )
   }
+
+  async getUserCreditCards(req) {
+    const userId = req.user.id
+
+    const creditCards = await this.creditCardRepository.find({
+      select: ['id', 'cardNumber', 'marca'],
+      where: { user: { id: userId } },
+    })
+
+    return HttpResponseSuccess(this.i18n.t('general.GET_SUCCESS'), creditCards)
+  }
 }

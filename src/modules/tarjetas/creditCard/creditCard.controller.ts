@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common'
+import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common'
 import { JwtAuthGuard } from '@/src/guards/jwt-auth.guard'
 import { CreditCardService } from '@/src/modules/tarjetas/creditCard/creditCard.service'
 import { CreateCreditCardDto } from '@/src/modules/tarjetas/creditCard/dto/createCreditCard.dto'
@@ -17,5 +17,11 @@ export class CreditCardController {
       req,
       createCreditCardDto.marca
     )
+  }
+
+  @Get('/credit')
+  @UseGuards(JwtAuthGuard)
+  async getUserCreditCards(@Req() req) {
+    return this.creditCardService.getUserCreditCards(req)
   }
 }
