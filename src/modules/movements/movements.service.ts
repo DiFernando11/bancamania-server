@@ -51,7 +51,6 @@ export class MovementsService {
     const movement = this.movementRepository.create({
       ...movementData,
       account: user?.account,
-      creditCard: user?.creditCard,
       debitCard: user?.debitCard,
       user,
     })
