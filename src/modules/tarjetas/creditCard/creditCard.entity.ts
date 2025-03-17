@@ -12,7 +12,7 @@ import {
   TypeCredit,
 } from '@/src/modules/tarjetas/creditCard/enums/creditEnum'
 import { INITIAL_LIMIT } from '@/src/modules/tarjetas/creditCard/utils/credit'
-import { DebitCardStatus } from '@/src/modules/tarjetas/debitCard/enum/DebitCardStatus'
+import { CardStatus } from '@/src/modules/tarjetas/enum/cardStatus.enum'
 import { Usuario } from '@/src/modules/users/users.entity'
 
 @Entity()
@@ -45,8 +45,8 @@ export class CreditCard {
   @Column({ default: INITIAL_LIMIT, nullable: false, type: 'decimal' })
   limit: number
 
-  @Column({ default: DebitCardStatus.INACTIVE, nullable: false })
-  status: DebitCardStatus
+  @Column({ default: CardStatus.BLOCKED, nullable: false })
+  status: CardStatus
 
   @ManyToOne(() => Usuario, (user) => user.creditCards, { onDelete: 'CASCADE' })
   user: Usuario

@@ -9,7 +9,7 @@ import {
 } from 'typeorm'
 import { Account } from '@/src/modules/account/account.entity'
 import { Movement } from '@/src/modules/movements/movements.entity'
-import { DebitCardStatus } from '@/src/modules/tarjetas/debitCard/enum/DebitCardStatus'
+import { CardStatus } from '@/src/modules/tarjetas/enum/cardStatus.enum'
 import { Usuario } from '@/src/modules/users/users.entity'
 
 @Entity()
@@ -33,8 +33,8 @@ export class DebitCard {
   @Column()
   owner: string
 
-  @Column({ default: DebitCardStatus.INACTIVE })
-  status: DebitCardStatus
+  @Column({ default: CardStatus.BLOCKED })
+  status: CardStatus
 
   @OneToOne(() => Usuario, { onDelete: 'CASCADE' })
   @JoinColumn()

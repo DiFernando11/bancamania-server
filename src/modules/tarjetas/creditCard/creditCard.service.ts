@@ -22,8 +22,8 @@ import {
   InitialVersion,
   NextVersionTypeCard,
   OffertTypeCard,
-  TypeOffert,
 } from '@/src/modules/tarjetas/creditCard/utils/credit'
+import { CardStatus } from '@/src/modules/tarjetas/enum/cardStatus.enum'
 import { TarjetasService } from '@/src/modules/tarjetas/tarjetas.service'
 import { Usuario } from '@/src/modules/users/users.entity'
 
@@ -165,5 +165,31 @@ export class CreditCardService {
       )
     }
     return HttpResponseSuccess(this.i18n.t('general.GET_SUCCESS'), creditCard)
+  }
+
+  async updateCreditCardStatus(req, id) {
+    const debitCard = await this.creditCardRepository.findOne({
+      where: { id, user: { id: req.user.id } },
+    })
+
+    if (!debitCard) {
+      ThrowHttpException(
+        this.i18n.t('tarjetas.DEBIT_NOT_FOUND'),
+        HttpResponseStatus.NOT_FOUND
+      )
+    }
+
+    const nextStatus: Record<CardStatus, CardStatus> = {
+      [CardStatus.ACTIVE]: CardStatus.BLOCKED,
+      [CardStatus.BLOCKED]: CardStatus.ACTIVE,
+    }
+    const newStatus = nextStatus[debitCard.status]
+    debitCard.status = newStatus
+    await this.creditCardRepository.save(debitCard)
+    return HttpResponseSuccess(
+      this.i18n.t('tarjetas.STATUS_UPDATED'),
+      { newStatus },
+      HttpResponseStatus.OK
+    )
   }
 }

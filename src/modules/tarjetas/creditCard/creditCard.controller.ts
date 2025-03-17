@@ -4,6 +4,7 @@ import {
   Get,
   Param,
   Post,
+  Put,
   Req,
   UseGuards,
 } from '@nestjs/common'
@@ -38,6 +39,15 @@ export class CreditCardController {
   @UseGuards(JwtAuthGuard)
   async getOffertCredit(@Req() req) {
     return this.creditCardService.getOffertCredit(req)
+  }
+
+  @Put('/credit/status/:uuid')
+  @UseGuards(JwtAuthGuard)
+  async updateCreditCardStatus(
+    @Req() req: Request,
+    @Param() params: GetCardCreditDto
+  ) {
+    return this.creditCardService.updateCreditCardStatus(req, params.uuid)
   }
 
   @Get('/credit/:uuid')

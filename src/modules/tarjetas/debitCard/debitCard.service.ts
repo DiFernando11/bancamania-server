@@ -14,7 +14,7 @@ import {
 import { EntitiesType } from '@/src/enum/entities.enum'
 import { TypeMovement } from '@/src/modules/movements/enum/type-movement.enum'
 import { MovementsService } from '@/src/modules/movements/movements.service'
-import { DebitCardStatus } from '@/src/modules/tarjetas/debitCard/enum/DebitCardStatus'
+import { CardStatus } from '@/src/modules/tarjetas/enum/cardStatus.enum'
 import { TarjetasService } from '@/src/modules/tarjetas/tarjetas.service'
 import { Usuario } from '@/src/modules/users/users.entity'
 import { DebitCard } from './debitCard.entity'
@@ -98,10 +98,9 @@ export class DebitCardService {
       )
     }
 
-    const nextStatus: Record<DebitCardStatus, DebitCardStatus> = {
-      [DebitCardStatus.INACTIVE]: DebitCardStatus.ACTIVE,
-      [DebitCardStatus.ACTIVE]: DebitCardStatus.BLOCKED,
-      [DebitCardStatus.BLOCKED]: DebitCardStatus.ACTIVE,
+    const nextStatus: Record<CardStatus, CardStatus> = {
+      [CardStatus.ACTIVE]: CardStatus.BLOCKED,
+      [CardStatus.BLOCKED]: CardStatus.ACTIVE,
     }
     const newStatus = nextStatus[debitCard.status]
     debitCard.status = newStatus
