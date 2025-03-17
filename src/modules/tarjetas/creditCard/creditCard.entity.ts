@@ -7,8 +7,12 @@ import {
   Unique,
 } from 'typeorm'
 import { Movement } from '@/src/modules/movements/movements.entity'
+import {
+  CreditCardVersion,
+  TypeCredit,
+} from '@/src/modules/tarjetas/creditCard/enums/creditEnum'
+import { INITIAL_LIMIT } from '@/src/modules/tarjetas/creditCard/utils/credit'
 import { DebitCardStatus } from '@/src/modules/tarjetas/debitCard/enum/DebitCardStatus'
-import { TypeCredit } from '@/src/modules/tarjetas/debitCard/enum/typeCredit'
 import { Usuario } from '@/src/modules/users/users.entity'
 
 @Entity()
@@ -31,6 +35,12 @@ export class CreditCard {
 
   @Column({ nullable: false })
   marca: TypeCredit
+
+  @Column({ nullable: false })
+  version: CreditCardVersion
+
+  @Column({ default: INITIAL_LIMIT, nullable: false, type: 'decimal' })
+  limit: number
 
   @Column({ default: DebitCardStatus.INACTIVE, nullable: false })
   status: DebitCardStatus

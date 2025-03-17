@@ -1,5 +1,5 @@
 import { IsEnum } from 'class-validator'
-import { TypeCredit } from '@/src/modules/tarjetas/debitCard/enum/typeCredit'
+import { TypeCredit } from '@/src/modules/tarjetas/creditCard/enums/creditEnum'
 
 export class CreateCreditCardDto {
   @IsEnum(TypeCredit, {

@@ -24,4 +24,10 @@ export class CreditCardController {
   async getUserCreditCards(@Req() req) {
     return this.creditCardService.getUserCreditCards(req)
   }
+
+  @Get('/credit/offerts')
+  @UseGuards(JwtAuthGuard)
+  async getOffertCredit(@Req() req) {
+    return this.creditCardService.getOffertCredit(req)
+  }
 }
