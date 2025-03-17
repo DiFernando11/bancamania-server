@@ -2,9 +2,10 @@
   "CREATE_CREDIT": "Se asigna la tarjeta de credito al usuario de manera exitosa",
   "CREATE_DEBIT": "Se asigna la tarjeta de debito al usuario de manera exitosa",
   "CREDIT_EXISTS": "El usuario ya tiene una tarjeta de credito registrada.",
+  "CREDIT_NOT_FOUND": "No se pudo encontrar la tarjeta de crédito",
   "DEBIT_EXISTS": "El usuario ya tiene una tarjeta de debito registrada.",
   "DEBIT_NOT_FOUND": "No se pudo encontrar la tarjeta de débito",
   "MASTER_BENEFIT": "Disfruta de meses sin intereses",
   "STATUS_UPDATED": "Estado de la tarjeta se ha modificado con exito",
-  "VISA_BENEFIT": "Acumula millas con cada compra"
+  "VISA_BENEFIT": "Acumula mas millas con cada compra"
 }

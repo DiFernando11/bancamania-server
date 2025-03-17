@@ -2,9 +2,10 @@
   "CREATE_CREDIT": "The credit card is assigned to the user successfully",
   "CREATE_DEBIT": "The debit card is assigned to the user successfully",
   "CREDIT_EXISTS": "The user already has a registered debit card.",
+  "CREDIT_NOT_FOUND": "The credit card could not be found.",
   "DEBIT_EXISTS": "The user already has a registered credit card.",
   "DEBIT_NOT_FOUND": "The debit card could not be found.",
   "MASTER_BENEFIT": "Enjoy months without interest",
   "STATUS_UPDATED": "Card status has been successfully changed.",
-  "VISA_BENEFIT": "Earn miles with every purchase"
+  "VISA_BENEFIT": "Earn more miles with every purchase"
 }

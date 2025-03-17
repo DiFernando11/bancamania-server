@@ -103,7 +103,7 @@ export class CreditCardService {
     const userId = req.user.id
 
     const creditCards = await this.creditCardRepository.find({
-      select: ['id', 'cardNumber', 'marca'],
+      select: ['id', 'cardNumber', 'marca', 'version'],
       where: { user: { id: userId } },
     })
 
@@ -129,7 +129,7 @@ export class CreditCardService {
             id: uuidv4(),
             limit: initialVersionCard.limit,
             marca: brand,
-            textOffert: OffertTypeCard[brand],
+            textOffert: this.i18n.t(`tarjetas.${OffertTypeCard[brand]}`),
             version: initialVersionCard.version,
           })
         } else {
@@ -151,5 +151,19 @@ export class CreditCardService {
     )
 
     return HttpResponseSuccess(this.i18n.t('general.GET_SUCCESS'), offerts)
+  }
+
+  async getCardCreditByUUID(req, id) {
+    const creditCard = await this.creditCardRepository.findOne({
+      where: { id, user: { id: req.user.id } },
+    })
+
+    if (!creditCard) {
+      ThrowHttpException(
+        this.i18n.t('tarjetas.CREDIT_NOT_FOUND'),
+        HttpResponseStatus.NOT_FOUND
+      )
+    }
+    return HttpResponseSuccess(this.i18n.t('general.GET_SUCCESS'), creditCard)
   }
 }
