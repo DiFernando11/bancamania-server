@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { I18nService } from 'nestjs-i18n'
 import { Repository } from 'typeorm'
+import { v4 as uuidv4 } from 'uuid'
 import { HttpResponseStatus } from '@/src/common/constants'
 import {
   formatDate,
@@ -15,7 +16,14 @@ import { EntitiesType } from '@/src/enum/entities.enum'
 import { TypeMovement } from '@/src/modules/movements/enum/type-movement.enum'
 import { Movement } from '@/src/modules/movements/movements.entity'
 import { CreditCard } from '@/src/modules/tarjetas/creditCard/creditCard.entity'
-import { TypeCredit } from '@/src/modules/tarjetas/debitCard/enum/typeCredit'
+import { TypeCredit } from '@/src/modules/tarjetas/creditCard/enums/creditEnum'
+import {
+  cardPrefixNumber,
+  InitialVersion,
+  NextVersionTypeCard,
+  OffertTypeCard,
+  TypeOffert,
+} from '@/src/modules/tarjetas/creditCard/utils/credit'
 import { TarjetasService } from '@/src/modules/tarjetas/tarjetas.service'
 import { Usuario } from '@/src/modules/users/users.entity'
 
@@ -54,12 +62,8 @@ export class CreditCardService {
       )
     }
 
-    const cardPrefixNumber = {
-      [TypeCredit.MASTERCARD]: 5,
-      [TypeCredit.VISA]: 3,
-    }
-
     const prefixCard = cardPrefixNumber[marca]
+    const version = InitialVersion?.[marca]?.version
 
     const newCard = this.creditCardRepository.create({
       cardNumber: generateUniqueNumber(user.id, 16, prefixCard),
@@ -67,6 +71,7 @@ export class CreditCardService {
       expirationDate: this.tarjetasService.generateExpirationDate(),
       marca,
       user: user,
+      version: InitialVersion[marca].version,
     })
 
     const currentCard = await this.creditCardRepository.save(newCard)
@@ -76,7 +81,7 @@ export class CreditCardService {
       description: saveTranslation({
         args: {
           date: formatDate(currentCard.createdAt, 'DD MMM'),
-          marca,
+          marca: `${marca} | ${version}`,
         },
         key: 'movements.MOV_CREDIT_CREATE',
       }),
@@ -103,5 +108,48 @@ export class CreditCardService {
     })
 
     return HttpResponseSuccess(this.i18n.t('general.GET_SUCCESS'), creditCards)
+  }
+
+  async getOffertCredit(req) {
+    const userId = req.user.id
+    const creditCards = await this.creditCardRepository.find({
+      select: ['marca', 'version', 'id', 'limit'],
+      where: { user: { id: userId } },
+    })
+
+    const availableBrands = [TypeCredit.VISA, TypeCredit.MASTERCARD]
+
+    const offerts = availableBrands.reduce(
+      (acc, brand) => {
+        const existingCard = creditCards.find((card) => card.marca === brand)
+
+        if (!existingCard) {
+          const initialVersionCard = InitialVersion[brand]
+          acc.newCards.push({
+            id: uuidv4(),
+            limit: initialVersionCard.limit,
+            marca: brand,
+            textOffert: OffertTypeCard[brand],
+            version: initialVersionCard.version,
+          })
+        } else {
+          const nextVersion = NextVersionTypeCard[brand][existingCard.version]
+          if (nextVersion) {
+            acc.increaseVersion.push({
+              currentLimit: existingCard.limit,
+              id: existingCard.id,
+              marca: brand,
+              newLimit: nextVersion.limit,
+              version: nextVersion.version,
+            })
+          }
+        }
+
+        return acc
+      },
+      { increaseVersion: [], newCards: [] }
+    )
+
+    return HttpResponseSuccess(this.i18n.t('general.GET_SUCCESS'), offerts)
   }
 }
