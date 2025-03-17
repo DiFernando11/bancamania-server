@@ -11,11 +11,6 @@ export const cardPrefixNumber = {
 
 export const INITIAL_LIMIT = 1000
 
-export const TypeOffert = {
-  HIRE_CARD: 2,
-  UPDATE_VERSION: 1,
-}
-
 export const CurrentVersionMasterCard: Record<
   Mastercard,
   { limit: number; version: Mastercard }
