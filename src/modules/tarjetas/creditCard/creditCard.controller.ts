@@ -1,7 +1,16 @@
-import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common'
 import { JwtAuthGuard } from '@/src/guards/jwt-auth.guard'
 import { CreditCardService } from '@/src/modules/tarjetas/creditCard/creditCard.service'
 import { CreateCreditCardDto } from '@/src/modules/tarjetas/creditCard/dto/createCreditCard.dto'
+import { GetCardCreditDto } from '@/src/modules/tarjetas/creditCard/dto/getCreditCard.dto'
 
 @Controller('cards')
 export class CreditCardController {
@@ -29,5 +38,14 @@ export class CreditCardController {
   @UseGuards(JwtAuthGuard)
   async getOffertCredit(@Req() req) {
     return this.creditCardService.getOffertCredit(req)
+  }
+
+  @Get('/credit/:uuid')
+  @UseGuards(JwtAuthGuard)
+  async getCardCreditByUUID(
+    @Req() req: Request,
+    @Param() params: GetCardCreditDto
+  ) {
+    return this.creditCardService.getCardCreditByUUID(req, params.uuid)
   }
 }

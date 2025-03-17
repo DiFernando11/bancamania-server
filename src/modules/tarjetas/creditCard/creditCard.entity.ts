@@ -39,6 +39,9 @@ export class CreditCard {
   @Column({ nullable: false })
   version: CreditCardVersion
 
+  @Column({ default: 100 })
+  miles: number
+
   @Column({ default: INITIAL_LIMIT, nullable: false, type: 'decimal' })
   limit: number
 
