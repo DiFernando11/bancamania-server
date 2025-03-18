@@ -34,7 +34,11 @@ export class ReceiptsService {
     user
     title: string
     description: string
-    dataReceipts: { key: string; value: string | number }[]
+    dataReceipts: {
+      key: string
+      value?: string | number
+      style?: { hr: boolean }
+    }[]
   }): Promise<Receipt> {
     const receipt = this.receiptRepository.create({
       dataReceipts,

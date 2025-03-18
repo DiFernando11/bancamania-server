@@ -41,6 +41,15 @@ export class CreditCardController {
     return this.creditCardService.getOffertCredit(req)
   }
 
+  @Put('/credit/version/receipt/:uuid')
+  @UseGuards(JwtAuthGuard)
+  async createReceiptUpdgradeVersion(
+    @Req() req: Request,
+    @Param() params: GetCardCreditDto
+  ) {
+    return this.creditCardService.createReceiptUpdgradeVersion(req, params.uuid)
+  }
+
   @Put('/credit/status/:uuid')
   @UseGuards(JwtAuthGuard)
   async updateCreditCardStatus(
@@ -52,7 +61,7 @@ export class CreditCardController {
 
   @Put('/credit/version/:uuid')
   @UseGuards(JwtAuthGuard)
-  async updateCreditCardVersion(
+  async upgradeCreditCardVersion(
     @Req() req: Request,
     @Param() params: GetCardCreditDto
   ) {

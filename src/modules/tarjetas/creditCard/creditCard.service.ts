@@ -15,6 +15,8 @@ import {
 import { EntitiesType } from '@/src/enum/entities.enum'
 import { TypeMovement } from '@/src/modules/movements/enum/type-movement.enum'
 import { Movement } from '@/src/modules/movements/movements.entity'
+import { Receipt } from '@/src/modules/receipts/receipts.entity'
+import { ReceiptsService } from '@/src/modules/receipts/receipts.service'
 import { CreditCard } from '@/src/modules/tarjetas/creditCard/creditCard.entity'
 import { TypeCredit } from '@/src/modules/tarjetas/creditCard/enums/creditEnum'
 import {
@@ -36,6 +38,7 @@ export class CreditCardService {
     private readonly userRepository: Repository<Usuario>,
     @InjectRepository(Movement)
     private readonly movementRepository: Repository<Movement>,
+    private readonly receiptService: ReceiptsService,
     private readonly i18n: I18nService,
     private readonly tarjetasService: TarjetasService
   ) {}
@@ -211,21 +214,98 @@ export class CreditCardService {
       )
     }
 
-    creditCard.version = nextVersion.version
-    const newCredit = await this.creditCardRepository.save(creditCard)
+    const newCredit = await this.creditCardRepository.save({
+      ...creditCard,
+      limit: nextVersion.limit,
+      version: nextVersion.version,
+    })
     return newCredit
   }
 
   async upgradeCreditCardVersion(req, id) {
     const creditCard = await this.creditCardRepository.findOne({
+      relations: [EntitiesType.USER],
       where: { id, user: { id: req.user.id } },
     })
 
     const versionUpdate = await this.updateVersion(creditCard)
 
+    await this.movementRepository.create({
+      creditCard: { id: creditCard.id },
+      description: saveTranslation({
+        args: {
+          date: formatDate(new Date(), 'DD MMM'),
+          version: versionUpdate.version,
+        },
+        key: 'movements.NEW_VERSION_CREDIT',
+      }),
+      title: fullName(creditCard.user),
+      totalBalance: 0,
+      typeMovement: TypeMovement.CARD,
+      user: { id: creditCard.user.id },
+    })
+
     return HttpResponseSuccess(
       this.i18n.t('tarjetas.UPGRADE_VERSION_SUCCESS'),
-      { nextVersion: versionUpdate.version },
+      { limit: versionUpdate.limit, nextVersion: versionUpdate.version },
+      HttpResponseStatus.OK
+    )
+  }
+
+  async createReceiptUpdgradeVersion(req, id) {
+    const creditCard = await this.creditCardRepository.findOne({
+      relations: [EntitiesType.USER],
+      where: { id, user: { id: req.user.id } },
+    })
+    const versionUpdate = await this.updateVersion(creditCard)
+    const receipt = await this.receiptService.createReceipt({
+      dataReceipts: [
+        { key: 'owner' },
+        {
+          key: 'name',
+          style: {
+            hr: true,
+          },
+          value: fullName(creditCard.user),
+        },
+        { key: 'detailCard' },
+        {
+          key: 'brand',
+          style: {
+            hr: true,
+          },
+          value: creditCard.marca,
+        },
+
+        { key: 'version', value: creditCard.version },
+        {
+          key: 'limit',
+          style: {
+            hr: true,
+          },
+          value: creditCard.limit,
+        },
+        { key: 'newVersion', value: versionUpdate.version },
+        { key: 'newLimit', value: versionUpdate.limit },
+      ],
+      description: saveTranslation({
+        args: {
+          date: formatDate(new Date(), 'DD MMM'),
+          version: versionUpdate.version,
+        },
+        key: 'movements.NEW_VERSION_CREDIT',
+      }),
+      title: 'newVersion',
+      user: creditCard.user,
+    })
+
+    return HttpResponseSuccess(
+      this.i18n.t('tarjetas.UPGRADE_VERSION_SUCCESS'),
+      {
+        limit: versionUpdate.limit,
+        nextVersion: versionUpdate.version,
+        receiptID: receipt.id,
+      },
       HttpResponseStatus.OK
     )
   }
