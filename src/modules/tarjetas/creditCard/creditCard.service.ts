@@ -42,12 +42,7 @@ export class CreditCardService {
     private readonly tarjetasService: TarjetasService
   ) {}
 
-  async createCreditCard(req, marca: TypeCredit) {
-    const user = await this.userRepository.findOne({
-      relations: [EntitiesType.CREDIT_CARD, EntitiesType.ACCOUNT],
-      where: { id: req.user.id },
-    })
-
+  async createCreditBase(user, marca) {
     if (!user) {
       ThrowHttpException(
         this.i18n.t('general.USER_NOT_FOUND'),
@@ -94,9 +89,70 @@ export class CreditCardService {
     })
 
     await this.movementRepository.save(movement)
+    return newCard
+  }
+
+  async createCreditCard(req, marca: TypeCredit) {
+    const user = await this.userRepository.findOne({
+      relations: [EntitiesType.CREDIT_CARD, EntitiesType.ACCOUNT],
+      where: { id: req.user.id },
+    })
+
+    await this.createCreditBase(user, marca)
 
     return HttpResponseSuccess(
       this.i18n.t('tarjetas.CREATE_CREDIT'),
+      HttpResponseStatus.CREATED
+    )
+  }
+
+  async createCreditCardReceipt(req, marca: TypeCredit) {
+    const user = await this.userRepository.findOne({
+      relations: [EntitiesType.CREDIT_CARD, EntitiesType.ACCOUNT],
+      where: { id: req.user.id },
+    })
+
+    const newCard = await this.createCreditBase(user, marca)
+
+    const receipt = await this.receiptService.createReceipt({
+      dataReceipts: [
+        { key: 'owner' },
+        {
+          key: 'name',
+          style: {
+            hr: true,
+          },
+          value: fullName(user),
+        },
+        { key: 'detailCard' },
+        {
+          key: 'brand',
+          style: {
+            hr: true,
+          },
+          value: newCard.marca,
+        },
+
+        { key: 'version', value: newCard.version },
+        {
+          key: 'limit',
+          value: newCard.limit,
+        },
+      ],
+      description: saveTranslation({
+        args: {
+          date: formatDate(new Date(), 'DD MMM'),
+          marca: newCard.marca,
+        },
+        key: 'movements.MOV_CREDIT_CREATE',
+      }),
+      title: 'newCard',
+      user,
+    })
+
+    return HttpResponseSuccess(
+      this.i18n.t('tarjetas.CREATE_CREDIT'),
+      { receiptID: receipt.id },
       HttpResponseStatus.CREATED
     )
   }
