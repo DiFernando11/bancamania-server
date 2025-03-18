@@ -15,7 +15,6 @@ import {
 import { EntitiesType } from '@/src/enum/entities.enum'
 import { TypeMovement } from '@/src/modules/movements/enum/type-movement.enum'
 import { Movement } from '@/src/modules/movements/movements.entity'
-import { Receipt } from '@/src/modules/receipts/receipts.entity'
 import { ReceiptsService } from '@/src/modules/receipts/receipts.service'
 import { CreditCard } from '@/src/modules/tarjetas/creditCard/creditCard.entity'
 import { TypeCredit } from '@/src/modules/tarjetas/creditCard/enums/creditEnum'
@@ -219,6 +218,22 @@ export class CreditCardService {
       limit: nextVersion.limit,
       version: nextVersion.version,
     })
+
+    const movement = await this.movementRepository.create({
+      creditCard: { id: creditCard.id },
+      description: saveTranslation({
+        args: {
+          date: formatDate(new Date(), 'DD MMM'),
+          version: nextVersion.version,
+        },
+        key: 'movements.NEW_VERSION_CREDIT',
+      }),
+      title: fullName(creditCard.user),
+      totalBalance: 0,
+      typeMovement: TypeMovement.CARD,
+      user: { id: creditCard.user.id },
+    })
+    await this.movementRepository.save(movement)
     return newCredit
   }
 
@@ -229,21 +244,6 @@ export class CreditCardService {
     })
 
     const versionUpdate = await this.updateVersion(creditCard)
-
-    await this.movementRepository.create({
-      creditCard: { id: creditCard.id },
-      description: saveTranslation({
-        args: {
-          date: formatDate(new Date(), 'DD MMM'),
-          version: versionUpdate.version,
-        },
-        key: 'movements.NEW_VERSION_CREDIT',
-      }),
-      title: fullName(creditCard.user),
-      totalBalance: 0,
-      typeMovement: TypeMovement.CARD,
-      user: { id: creditCard.user.id },
-    })
 
     return HttpResponseSuccess(
       this.i18n.t('tarjetas.UPGRADE_VERSION_SUCCESS'),

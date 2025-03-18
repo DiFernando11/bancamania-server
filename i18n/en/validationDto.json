@@ -9,6 +9,7 @@
   "BALANCE_NUMBER": "The balance must be a number",
   "CODE_LENGTH": "The verification code must be exactly 6 characters long.",
   "CODE_REQUIRED": "The verification code is required.",
+  "CREDIT_CARD_ID_INVALID": "The credit card ID must be a valid UUID.",
   "DATE_FROM_INVALID": "The 'from' date must be in the format YYYY-MM-DD or ISO8601.",
   "DATE_TO_INVALID": "The 'to' date must be in the format YYYY-MM-DD or ISO8601.",
   "DEBIT_CARD_ID_INVALID": "The debit card ID must be a valid UUID.",
