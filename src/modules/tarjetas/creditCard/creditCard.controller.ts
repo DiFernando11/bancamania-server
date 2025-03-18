@@ -50,6 +50,15 @@ export class CreditCardController {
     return this.creditCardService.updateCreditCardStatus(req, params.uuid)
   }
 
+  @Put('/credit/version/:uuid')
+  @UseGuards(JwtAuthGuard)
+  async updateCreditCardVersion(
+    @Req() req: Request,
+    @Param() params: GetCardCreditDto
+  ) {
+    return this.creditCardService.upgradeCreditCardVersion(req, params.uuid)
+  }
+
   @Get('/credit/:uuid')
   @UseGuards(JwtAuthGuard)
   async getCardCreditByUUID(
