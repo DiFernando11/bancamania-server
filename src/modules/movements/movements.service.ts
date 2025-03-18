@@ -82,13 +82,21 @@ export class MovementsService {
     req
   ): PromiseApiResponse<GetUserMovementsResponse> {
     try {
-      const { accountId, debitCardId, limit, page, fechaDesde, fechaHasta } =
-        queryParams
+      const {
+        accountId,
+        debitCardId,
+        creditCardId,
+        limit,
+        page,
+        fechaDesde,
+        fechaHasta,
+      } = queryParams
 
       const filters: any = {
         user: { id: req.user.id },
         ...(accountId && { account: Equal(accountId) }),
         ...(debitCardId && { debitCard: Equal(debitCardId) }),
+        ...(creditCardId && { creditCard: { id: creditCardId } }),
         ...createFilterDate(fechaDesde, fechaHasta),
       }
       const { skip, take, createResponse } = createPaginationData({

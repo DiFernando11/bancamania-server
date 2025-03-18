@@ -11,6 +11,10 @@ export class GetUserMovementsDto {
   debitCardId?: string
 
   @IsOptional()
+  @IsUUID('4', { message: 'CREDIT_CARD_ID_INVALID' })
+  creditCardId?: string
+
+  @IsOptional()
   @Transform(({ value }) => (typeof value === 'string' ? Number(value) : value))
   @IsInt({ message: 'LIMIT_NUMBER' })
   limit?: number
