@@ -3,11 +3,17 @@
   "accountDestine": "Cuenta destino",
   "accountNumber": "Número de cuenta",
   "amount": "Monto",
+  "brand": "Marca",
   "date": "Fecha: {date}",
+  "detailCard": "Detalles de la tarjeta",
+  "limit": "Limit",
   "name": "Nombre",
+  "newLimit": "Nuevo Límite",
+  "newVersion": "Nueva Versión",
   "originAccount": "Cuenta origen",
   "owner": "Propietario",
   "reason": "Motivo",
   "receipt": "Comprobante {rec}",
-  "titleTransfer": "Transferencia exitosa"
+  "titleTransfer": "Transferencia exitosa",
+  "version": "Versión"
 }

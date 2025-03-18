@@ -3,11 +3,17 @@
   "accountDestine": "Destination Account",
   "accountNumber": "Account Number",
   "amount": "Amount",
+  "brand": "Brand",
   "date": "Date: {date}",
+  "detailCard": "Card details",
+  "limit": "Limite",
   "name": "Name",
+  "newLimit": "New Limit",
+  "newVersion": "New Version",
   "originAccount": "Origin Account",
   "owner": "Owner",
   "reason": "Reason",
   "receipt": "Receipt {rec}",
-  "titleTransfer": "Transfer successful"
+  "titleTransfer": "Transfer successful",
+  "version": "Version"
 }
