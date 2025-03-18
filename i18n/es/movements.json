@@ -8,5 +8,6 @@
   "MOV_GIFT_BALANCE": "¡Tienes un regalo! Se ha depositado dinero en tu cuenta de ahorros.",
   "MOV_RECEIVE_TRANSFER": "Recibiste una transferencia de {balance} - {date}",
   "MOV_SEND_TRANSFER": "Enviaste una transferencia de {balance} - {date}",
+  "NEW_VERSION_CREDIT": "Has adquirido una nueva versión de tu tarjeta - {version} - {date}",
   "STATEMENT": "ESTADO DE CUENTA"
 }

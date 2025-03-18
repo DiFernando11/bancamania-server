@@ -29,6 +29,18 @@ export class CreditCardController {
     )
   }
 
+  @Post('/credit/receipt')
+  @UseGuards(JwtAuthGuard)
+  async createCreditCardReceipt(
+    @Req() req,
+    @Body() createCreditCardDto: CreateCreditCardDto
+  ) {
+    return this.creditCardService.createCreditCardReceipt(
+      req,
+      createCreditCardDto.marca
+    )
+  }
+
   @Get('/credit')
   @UseGuards(JwtAuthGuard)
   async getUserCreditCards(@Req() req) {
