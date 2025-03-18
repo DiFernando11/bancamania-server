@@ -168,13 +168,13 @@ export class CreditCardService {
   }
 
   async updateCreditCardStatus(req, id) {
-    const debitCard = await this.creditCardRepository.findOne({
+    const creditCard = await this.creditCardRepository.findOne({
       where: { id, user: { id: req.user.id } },
     })
 
-    if (!debitCard) {
+    if (!creditCard) {
       ThrowHttpException(
-        this.i18n.t('tarjetas.DEBIT_NOT_FOUND'),
+        this.i18n.t('tarjetas.CREDIT_NOT_FOUND'),
         HttpResponseStatus.NOT_FOUND
       )
     }
@@ -183,12 +183,49 @@ export class CreditCardService {
       [CardStatus.ACTIVE]: CardStatus.BLOCKED,
       [CardStatus.BLOCKED]: CardStatus.ACTIVE,
     }
-    const newStatus = nextStatus[debitCard.status]
-    debitCard.status = newStatus
-    await this.creditCardRepository.save(debitCard)
+    const newStatus = nextStatus[creditCard.status]
+    creditCard.status = newStatus
+    await this.creditCardRepository.save(creditCard)
     return HttpResponseSuccess(
       this.i18n.t('tarjetas.STATUS_UPDATED'),
       { newStatus },
+      HttpResponseStatus.OK
+    )
+  }
+
+  async updateVersion(creditCard) {
+    if (!creditCard) {
+      ThrowHttpException(
+        this.i18n.t('tarjetas.CREDIT_NOT_FOUND'),
+        HttpResponseStatus.NOT_FOUND
+      )
+    }
+
+    const nextVersion =
+      NextVersionTypeCard[creditCard.marca][creditCard.version]
+
+    if (!nextVersion) {
+      ThrowHttpException(
+        this.i18n.t('tarjetas.MAX_VERSION_UPDATE'),
+        HttpResponseStatus.CONFLICT
+      )
+    }
+
+    creditCard.version = nextVersion.version
+    const newCredit = await this.creditCardRepository.save(creditCard)
+    return newCredit
+  }
+
+  async upgradeCreditCardVersion(req, id) {
+    const creditCard = await this.creditCardRepository.findOne({
+      where: { id, user: { id: req.user.id } },
+    })
+
+    const versionUpdate = await this.updateVersion(creditCard)
+
+    return HttpResponseSuccess(
+      this.i18n.t('tarjetas.UPGRADE_VERSION_SUCCESS'),
+      { nextVersion: versionUpdate.version },
       HttpResponseStatus.OK
     )
   }
