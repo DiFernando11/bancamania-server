@@ -8,6 +8,7 @@ import { ContactAccountsModule } from '@/src/modules/contacts/contactAccounts..m
 import { MovementsModule } from '@/src/modules/movements/movements.module'
 import { PdfModule } from '@/src/modules/pdf/pdf.module'
 import { ReceiptsModule } from '@/src/modules/receipts/receipts.module'
+import { StoreModule } from '@/src/modules/store/store.module'
 import { CreditCardModule } from '@/src/modules/tarjetas/creditCard/creditCard.module'
 import { DebitCardModule } from '@/src/modules/tarjetas/debitCard/debitCard.module'
 import { TransfersModule } from '@/src/modules/transfers/transfers.module'
@@ -42,6 +43,7 @@ import { WhatsappModule } from './modules/whatsapp/whatsapp.module'
     ReceiptsModule,
     ContactAccountsModule,
     CreditCardModule,
+    StoreModule,
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
