@@ -1,6 +1,7 @@
-import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common'
+import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common'
 import { JwtAuthGuard } from '@/src/guards/jwt-auth.guard'
 import { CreateItemStoreDto } from '@/src/modules/store/dto/createItemStore.dto'
+import { GetItemsStoreDto } from '@/src/modules/store/dto/getItemsStore.dto'
 import { StoreService } from '@/src/modules/store/store.service'
 
 @Controller('store')
@@ -15,7 +16,7 @@ export class StoreController {
 
   @Get('/')
   @UseGuards(JwtAuthGuard)
-  async getItemsStore(@Req() req) {
-    return this.storeService.getItemsStore(req)
+  async getDataAccounts(@Query() query: GetItemsStoreDto) {
+    return this.storeService.getItemsStore(query.page, query.limit)
   }
 }
