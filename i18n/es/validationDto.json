@@ -20,6 +20,7 @@
   "FIRSTNAME_REQUIRED": "El nombre es obligatorio.",
   "FIRSTNAME_STRING": "El nombre debe ser una cadena de texto.",
   "IS_ARRAY": "El campo debe ser un arreglo",
+  "IS_GREATER_ZERO": "El campo debe ser mayor a 0",
   "IS_MIN_ONE": "La cantidad mínima es 1",
   "IS_NUMBER": "El campo debe ser un numero",
   "IS_STRING": "El campo debe ser un string",

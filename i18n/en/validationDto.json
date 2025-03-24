@@ -21,6 +21,7 @@
   "FIRSTNAME_REQUIRED": "The first name is required.",
   "FIRSTNAME_STRING": "The first name must be a string.",
   "IS_ARRAY": "The field must be array",
+  "IS_GREATER_ZERO": "The field must be greater than 0",
   "IS_MIN_ONE": "The minimum quantity is 1",
   "IS_NUMBER": "The field must be a number",
   "IS_STRING": "The field must be a string",

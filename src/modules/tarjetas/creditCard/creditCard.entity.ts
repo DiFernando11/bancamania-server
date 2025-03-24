@@ -6,6 +6,7 @@ import {
   PrimaryGeneratedColumn,
   Unique,
 } from 'typeorm'
+import { DeferredPurchase } from '@/src/modules/deferredInstallment/deferredPurchase.entity'
 import { Movement } from '@/src/modules/movements/movements.entity'
 import {
   CreditCardVersion,
@@ -45,6 +46,15 @@ export class CreditCard {
   @Column({ default: INITIAL_LIMIT, nullable: false, type: 'decimal' })
   limit: number
 
+  @Column({ nullable: false, type: 'decimal' })
+  quota: number
+
+  @Column({ nullable: false, type: 'decimal' })
+  interestRate: number
+
+  @Column({ nullable: false })
+  monthMaxWithoutInterest: number
+
   @Column({ default: CardStatus.BLOCKED, nullable: false })
   status: CardStatus
 
@@ -53,4 +63,7 @@ export class CreditCard {
 
   @OneToMany(() => Movement, (movement) => movement.creditCard)
   movements: Movement[]
+
+  @OneToMany(() => DeferredPurchase, (purchase) => purchase.creditCard)
+  deferredPurchases: DeferredPurchase[]
 }
