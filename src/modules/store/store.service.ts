@@ -1,17 +1,48 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { I18nService } from 'nestjs-i18n'
-import { Repository } from 'typeorm'
+import { In, Repository } from 'typeorm'
 import { HttpResponseStatus } from '@/src/common/constants'
-import { createPaginationData, HttpResponseSuccess } from '@/src/common/utils'
+import {
+  bitcoinSymbol,
+  createPaginationData,
+  formatDate,
+  fullName,
+  HttpResponseSuccess,
+  saveTranslation,
+  ThrowHttpException,
+} from '@/src/common/utils'
+import { EntitiesType } from '@/src/enum/entities.enum'
+import { Account } from '@/src/modules/account/account.entity'
+import { TypeMovement } from '@/src/modules/movements/enum/type-movement.enum'
+import { Movement } from '@/src/modules/movements/movements.entity'
+import { Receipt } from '@/src/modules/receipts/receipts.entity'
+import { ReceiptsService } from '@/src/modules/receipts/receipts.service'
 import { CreateItemStoreDto } from '@/src/modules/store/dto/createItemStore.dto'
+import { PurchaseItemsStoreDto } from '@/src/modules/store/dto/purchaseItemStore.dto'
 import { Store } from '@/src/modules/store/store.entity'
+import { CreditCard } from '@/src/modules/tarjetas/creditCard/creditCard.entity'
+import { DebitCard } from '@/src/modules/tarjetas/debitCard/debitCard.entity'
+import {
+  BENEFIT_WITHOUT_INTEREST,
+  INTEREST_CARD,
+  TYPE_CARD,
+} from '@/src/modules/tarjetas/enum/cards'
+import { Usuario } from '@/src/modules/users/users.entity'
 
 @Injectable()
 export class StoreService {
   constructor(
     @InjectRepository(Store)
     private readonly storeRepository: Repository<Store>,
+    @InjectRepository(Usuario)
+    private readonly userRepository: Repository<Usuario>,
+    @InjectRepository(Account)
+    private readonly accountRepository: Repository<Account>,
+    @InjectRepository(Movement)
+    private readonly movementRepository: Repository<Movement>,
+    @InjectRepository(Receipt)
+    private readonly receiptRepository: Repository<Receipt>,
     private readonly i18n: I18nService
   ) {}
 
@@ -45,5 +76,183 @@ export class StoreService {
       ...createResponse(total),
       store: storeFormat,
     })
+  }
+
+  async purchaseDebit(totalWithInterest, user: Usuario, formatProductReceipt) {
+    return await this.accountRepository.manager.transaction(
+      async (transactionalEntityManager) => {
+        if (totalWithInterest > user.debitCard.account.balance) {
+          ThrowHttpException(
+            this.i18n.t('account.INSUFFICIENT_BALANCE'),
+            HttpResponseStatus.NOT_FOUND
+          )
+        }
+
+        const rawBalance = user.debitCard.account.balance - totalWithInterest
+        const balance = Math.ceil(rawBalance * 100) / 100
+
+        await transactionalEntityManager
+          .getRepository(Account)
+          .update({ id: user.debitCard.account.id }, { balance })
+
+        await transactionalEntityManager.getRepository(Movement).save({
+          account: user.debitCard.account,
+          debitCard: user.debitCard,
+          description: saveTranslation({
+            args: { balance: bitcoinSymbol(totalWithInterest) },
+            key: 'movements.PURCHASE_DEBIT',
+          }),
+          title: fullName(user),
+          totalBalance: balance,
+          typeMovement: TypeMovement.SHOPPING,
+          user,
+        })
+
+        const receipt = await transactionalEntityManager
+          .getRepository(Receipt)
+          .save({
+            dataReceipts: [
+              { key: 'payMethod', style: { hr: true } },
+              { key: 'typeCard', value: TYPE_CARD.DEBIT.toUpperCase() },
+              { key: 'numberCard', value: user.debitCard.cardNumber },
+              {
+                key: 'originAccount',
+                style: { hr: true },
+                value: user.debitCard.account.accountNumber,
+              },
+              { key: 'products', style: { hr: true } },
+              ...formatProductReceipt,
+              { key: 'total', value: bitcoinSymbol(totalWithInterest) },
+            ],
+            description: saveTranslation({
+              args: { balance: bitcoinSymbol(totalWithInterest) },
+              key: 'movements.PURCHASE_DEBIT',
+            }),
+            title: 'purchaseSuccess',
+            user,
+          })
+
+        return HttpResponseSuccess(this.i18n.t('store.PURCHASE_SUCCESS'), {
+          receiptID: receipt.id,
+        })
+      }
+    )
+  }
+
+  async getInformationPurchaseProducts({ products, interestMonth }) {
+    const productIds = products.map((p) => p.id)
+
+    const productsArray = await this.storeRepository.findBy({
+      id: In(productIds),
+    })
+
+    const formatProductReceipt = productsArray.flatMap((item) => {
+      const productQuantity = products.find((pr) => pr.id === item.id)
+      return [
+        {
+          key: item.title,
+        },
+        {
+          key: 'quantity',
+          value: productQuantity.quantity,
+        },
+        {
+          key: 'valueUnit',
+          value: bitcoinSymbol(item.price),
+        },
+        {
+          key: 'totalItem',
+          style: {
+            hr: true,
+          },
+          value: bitcoinSymbol(item.price * productQuantity.quantity),
+        },
+      ]
+    })
+
+    const total = products.reduce((acc, item) => {
+      const product = productsArray.find((p) => p.id === item.id)
+      if (!product) return acc
+
+      return acc + product.price * item.quantity
+    }, 0)
+
+    const interestTotal = total * interestMonth
+    const totalWithInterest = total + interestTotal
+
+    return { formatProductReceipt, totalWithInterest }
+  }
+
+  async purchaseItemsStore(req, dto: PurchaseItemsStoreDto) {
+    const { products, typeCard, idCard, deferredMonth } = dto
+    const isCredit = typeCard === TYPE_CARD.CREDIT
+    const isDebit = typeCard === TYPE_CARD.DEBIT
+
+    const relations = isCredit
+      ? [EntitiesType.CREDIT_CARD]
+      : [EntitiesType.DEBIT_CARD, EntitiesType.RS_DEBIT_ACCOUNT]
+
+    const where = {
+      id: req.user.id,
+      ...(!isCredit && {
+        debitCard: { id: idCard },
+      }),
+    }
+
+    const user = await this.userRepository.findOne({
+      relations,
+      where,
+    })
+
+    if (!user.debitCard && isDebit) {
+      ThrowHttpException(
+        this.i18n.t('tarjetas.DEBIT_NOT_FOUND'),
+        HttpResponseStatus.NOT_FOUND
+      )
+    }
+
+    let interestMonth = 0
+    let methodPay: DebitCard | CreditCard = user?.debitCard
+
+    if (isCredit) {
+      const creditCard = user.creditCards.find((card) => card.id === idCard)
+      if (!creditCard) {
+        ThrowHttpException(
+          this.i18n.t('tarjetas.CREDIT_NOT_FOUND'),
+          HttpResponseStatus.NOT_FOUND
+        )
+      }
+      const interest = INTEREST_CARD[creditCard.marca]
+      const monthsWithoutInteret = BENEFIT_WITHOUT_INTEREST[creditCard.marca]
+      if (deferredMonth > monthsWithoutInteret) {
+        interestMonth = deferredMonth * interest
+      }
+      methodPay = creditCard
+    }
+
+    const { totalWithInterest, formatProductReceipt } =
+      await this.getInformationPurchaseProducts({ interestMonth, products })
+
+    if (isDebit) {
+      return await this.purchaseDebit(
+        totalWithInterest,
+        user,
+        formatProductReceipt
+      )
+    }
+
+    // LA DE CREDITO
+    // MIRAR EL PAGO MENSUAL
+    // ACTUALIZAR EL CUPO TOTAL - LO QUE GASTO
+    // MIRAR COMO PODEMOS MOSTRARLE LO QUE DEBE PAGAR MENSUALMENTE
+    // CREAR UN COMPROBANTE
+    // CREAR UN MOVIMIENTO
+    // REVISAR EL ESTADO DE CUENTA
+
+    return HttpResponseSuccess(
+      this.i18n.t('store.CREATE_SUCCESS'),
+      { ...user },
+      HttpResponseStatus.CREATED
+    )
   }
 }

@@ -1,5 +1,6 @@
 {
-  "CREATE_SUCCESS": "Se ha creado un nuevo producto para tu tienda",
-  "UNO_DESCRIPTION": "Cartas UNO, el clásico juego de cartas que desafía tu estrategia y rapidez. ¡Diviértete con amigos y familia con reglas simples y giros inesperados!",
-  "UNO_TITTLE": "Uno cartas"
+  "CREATE_SUCCESS": "A new product has been created for your store",
+  "PURCHASE_SUCCESS": "Successful purchase",
+  "UNO_DESCRIPTION": "UNO cards, the classic card game that challenges your strategy and speed. Have fun with friends and family with simple rules and unexpected twists!",
+  "UNO_TITTLE": "Uno cards"
 }
