@@ -80,6 +80,7 @@ export class ReceiptsService {
       return {
         ...receipt,
         description: getTranslation({
+          createdAt: receipt.createdAt,
           description: receipt.description,
           i18n: this.i18n,
         }),

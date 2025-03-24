@@ -1,4 +1,4 @@
 export const globalConfig = {
-  expireInAccesToken: 1800, // seconds = 30 minutes
+  expireInAccesToken: 10800, // seconds = 3 horas
   expireInRefreshToken: 604800, // seconds = 7 days
 }

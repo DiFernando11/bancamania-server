@@ -9,6 +9,8 @@ import { ContactAccount } from '@/src/modules/contacts/contactAccounts.entity'
 import { Movement } from '@/src/modules/movements/movements.entity'
 import { MovementsService } from '@/src/modules/movements/movements.service'
 import { PdfService } from '@/src/modules/pdf/pdf.service'
+import { Receipt } from '@/src/modules/receipts/receipts.entity'
+import { ReceiptsService } from '@/src/modules/receipts/receipts.service'
 import { StoreController } from '@/src/modules/store/store.controller'
 import { Store } from '@/src/modules/store/store.entity'
 import { StoreService } from '@/src/modules/store/store.service'
@@ -29,6 +31,7 @@ import { JwtStrategy } from '../../strategies/jwt.strategy'
     TypeOrmModule.forFeature([Movement]),
     TypeOrmModule.forFeature([Store]),
     TypeOrmModule.forFeature([ContactAccount]),
+    TypeOrmModule.forFeature([Receipt]),
   ],
   providers: [
     JwtStrategy,
@@ -37,6 +40,7 @@ import { JwtStrategy } from '../../strategies/jwt.strategy'
     MovementsService,
     PdfService,
     StoreService,
+    ReceiptsService,
   ],
 })
 export class StoreModule {}

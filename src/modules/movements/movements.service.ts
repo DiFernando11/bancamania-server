@@ -116,6 +116,7 @@ export class MovementsService {
         return {
           ...movement,
           description: getTranslation({
+            createdAt: movement.createdAt,
             description: movement.description,
             i18n: this.i18n,
           }),

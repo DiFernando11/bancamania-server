@@ -3,4 +3,5 @@ export enum TypeMovement {
   TRANSFER = 'Transfers',
   CARD = 'Card',
   GIFT = 'Gift',
+  SHOPPING = 'Shopping',
 }
