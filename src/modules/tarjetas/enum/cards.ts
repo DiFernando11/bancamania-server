@@ -21,5 +21,5 @@ export const INTEREST_CARD = {
 
 export const BENEFIT_WITHOUT_INTEREST = {
   [TypeCredit.MASTERCARD]: 6,
-  [TypeCredit.VISA]: 0,
+  [TypeCredit.VISA]: 1,
 }

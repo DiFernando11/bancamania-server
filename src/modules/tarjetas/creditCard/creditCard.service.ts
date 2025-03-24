@@ -24,6 +24,10 @@ import {
   NextVersionTypeCard,
   OffertTypeCard,
 } from '@/src/modules/tarjetas/creditCard/utils/credit'
+import {
+  BENEFIT_WITHOUT_INTEREST,
+  INTEREST_CARD,
+} from '@/src/modules/tarjetas/enum/cards'
 import { CardStatus } from '@/src/modules/tarjetas/enum/cardStatus.enum'
 import { TarjetasService } from '@/src/modules/tarjetas/tarjetas.service'
 import { Usuario } from '@/src/modules/users/users.entity'
@@ -66,7 +70,10 @@ export class CreditCardService {
       cardNumber: generateUniqueNumber(user.id, 16, prefixCard),
       cvv: this.tarjetasService.generateCVV(),
       expirationDate: this.tarjetasService.generateExpirationDate(),
+      interestRate: INTEREST_CARD[marca],
       marca,
+      monthMaxWithoutInterest: BENEFIT_WITHOUT_INTEREST[marca],
+      quota: InitialVersion[marca].limit,
       user: user,
       version: InitialVersion[marca].version,
     })

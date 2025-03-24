@@ -28,6 +28,7 @@ import {
   INTEREST_CARD,
   TYPE_CARD,
 } from '@/src/modules/tarjetas/enum/cards'
+import { CardStatus } from '@/src/modules/tarjetas/enum/cardStatus.enum'
 import { Usuario } from '@/src/modules/users/users.entity'
 
 @Injectable()
@@ -78,9 +79,23 @@ export class StoreService {
     })
   }
 
-  async purchaseDebit(totalWithInterest, user: Usuario, formatProductReceipt) {
+  async purchaseDebit(user: Usuario, products) {
+    if (!user.debitCard) {
+      ThrowHttpException(
+        this.i18n.t('tarjetas.DEBIT_NOT_FOUND'),
+        HttpResponseStatus.NOT_FOUND
+      )
+    }
+    const { totalWithInterest, formatProductReceipt } =
+      await this.getInformationPurchaseProducts({ interestMonth: 0, products })
     return await this.accountRepository.manager.transaction(
       async (transactionalEntityManager) => {
+        if (user.debitCard.status === CardStatus.BLOCKED) {
+          ThrowHttpException(
+            this.i18n.t('account.CARD_DISABLED'),
+            HttpResponseStatus.NOT_FOUND
+          )
+        }
         if (totalWithInterest > user.debitCard.account.balance) {
           ThrowHttpException(
             this.i18n.t('account.INSUFFICIENT_BALANCE'),
@@ -183,8 +198,37 @@ export class StoreService {
     return { formatProductReceipt, totalWithInterest }
   }
 
+  async purchaseCredit({
+    user,
+    dto,
+  }: {
+    user: Usuario
+    dto: PurchaseItemsStoreDto
+  }) {
+    const { idCard, deferredMonth, products } = dto
+
+    const creditCard = user.creditCards.find((card) => card.id === idCard)
+    if (!creditCard) {
+      ThrowHttpException(
+        this.i18n.t('tarjetas.CREDIT_NOT_FOUND'),
+        HttpResponseStatus.NOT_FOUND
+      )
+    }
+    const interest = INTEREST_CARD[creditCard.marca]
+    const monthsWithoutInteret = BENEFIT_WITHOUT_INTEREST[creditCard.marca]
+
+    const interestMonth =
+      deferredMonth > monthsWithoutInteret ? deferredMonth * interest : 0
+
+    await this.getInformationPurchaseProducts({ interestMonth, products })
+
+    return HttpResponseSuccess(this.i18n.t('store.PURCHASE_SUCCESS'), {
+      receiptID: '12',
+    })
+  }
+
   async purchaseItemsStore(req, dto: PurchaseItemsStoreDto) {
-    const { products, typeCard, idCard, deferredMonth } = dto
+    const { products, typeCard, idCard } = dto
     const isCredit = typeCard === TYPE_CARD.CREDIT
     const isDebit = typeCard === TYPE_CARD.DEBIT
 
@@ -204,42 +248,11 @@ export class StoreService {
       where,
     })
 
-    if (!user.debitCard && isDebit) {
-      ThrowHttpException(
-        this.i18n.t('tarjetas.DEBIT_NOT_FOUND'),
-        HttpResponseStatus.NOT_FOUND
-      )
-    }
-
-    let interestMonth = 0
-    let methodPay: DebitCard | CreditCard = user?.debitCard
-
-    if (isCredit) {
-      const creditCard = user.creditCards.find((card) => card.id === idCard)
-      if (!creditCard) {
-        ThrowHttpException(
-          this.i18n.t('tarjetas.CREDIT_NOT_FOUND'),
-          HttpResponseStatus.NOT_FOUND
-        )
-      }
-      const interest = INTEREST_CARD[creditCard.marca]
-      const monthsWithoutInteret = BENEFIT_WITHOUT_INTEREST[creditCard.marca]
-      if (deferredMonth > monthsWithoutInteret) {
-        interestMonth = deferredMonth * interest
-      }
-      methodPay = creditCard
-    }
-
-    const { totalWithInterest, formatProductReceipt } =
-      await this.getInformationPurchaseProducts({ interestMonth, products })
-
     if (isDebit) {
-      return await this.purchaseDebit(
-        totalWithInterest,
-        user,
-        formatProductReceipt
-      )
+      return await this.purchaseDebit(user, products)
     }
+
+    return await this.purchaseCredit({ dto, user })
 
     // LA DE CREDITO
     // MIRAR EL PAGO MENSUAL

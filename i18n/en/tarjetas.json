@@ -1,10 +1,12 @@
 {
+  "CARD_DISABLED": "Your debit card is disabled for online purchases. Go to your card details and enable it to use it.",
   "CREATE_CREDIT": "The credit card is assigned to the user successfully",
   "CREATE_DEBIT": "The debit card is assigned to the user successfully",
   "CREDIT_EXISTS": "The user already has a registered debit card.",
   "CREDIT_NOT_FOUND": "The credit card could not be found.",
   "DEBIT_EXISTS": "The user already has a registered credit card.",
   "DEBIT_NOT_FOUND": "The debit card could not be found.",
+  "INSUFFICIENT_QUOTA": "Quota insufficient.",
   "MASTER_BENEFIT": "Enjoy months without interest",
   "MAX_VERSION_UPDATE": "You have already reached the maximum version available for your card.",
   "STATUS_UPDATED": "Card status has been successfully changed.",
