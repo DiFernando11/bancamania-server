@@ -17,17 +17,13 @@ import { TypeMovement } from '@/src/modules/movements/enum/type-movement.enum'
 import { Movement } from '@/src/modules/movements/movements.entity'
 import { ReceiptsService } from '@/src/modules/receipts/receipts.service'
 import { CreditCard } from '@/src/modules/tarjetas/creditCard/creditCard.entity'
+import { CreditCardVersion } from '@/src/modules/tarjetas/creditCard/creditCardVersions.entity'
 import { TypeCredit } from '@/src/modules/tarjetas/creditCard/enums/creditEnum'
 import {
   cardPrefixNumber,
   InitialVersion,
-  NextVersionTypeCard,
   OffertTypeCard,
 } from '@/src/modules/tarjetas/creditCard/utils/credit'
-import {
-  BENEFIT_WITHOUT_INTEREST,
-  INTEREST_CARD,
-} from '@/src/modules/tarjetas/enum/cards'
 import { CardStatus } from '@/src/modules/tarjetas/enum/cardStatus.enum'
 import { TarjetasService } from '@/src/modules/tarjetas/tarjetas.service'
 import { Usuario } from '@/src/modules/users/users.entity'
@@ -41,21 +37,23 @@ export class CreditCardService {
     private readonly userRepository: Repository<Usuario>,
     @InjectRepository(Movement)
     private readonly movementRepository: Repository<Movement>,
+    @InjectRepository(CreditCardVersion)
+    private readonly creditCardVersionRepository: Repository<CreditCardVersion>,
     private readonly receiptService: ReceiptsService,
     private readonly i18n: I18nService,
     private readonly tarjetasService: TarjetasService
   ) {}
 
-  async createCreditBase(user, marca) {
+  async createCreditBase(user: Usuario, brand) {
     if (!user) {
       ThrowHttpException(
         this.i18n.t('general.USER_NOT_FOUND'),
         HttpResponseStatus.NOT_FOUND
       )
     }
-
-    const existingCard = user?.creditCards?.some((card) => card.marca === marca)
-
+    const existingCard = user?.creditCards?.some(
+      (card) => card.version.brand.name === brand
+    )
     if (existingCard) {
       ThrowHttpException(
         this.i18n.t('tarjetas.CREDIT_EXISTS'),
@@ -63,49 +61,53 @@ export class CreditCardService {
       )
     }
 
-    const prefixCard = cardPrefixNumber[marca]
-    const version = InitialVersion?.[marca]?.version
+    const brand_version = await this.creditCardVersionRepository.findOne({
+      relations: [EntitiesType.BRAND],
+      where: {
+        brand: { name: brand },
+        name: InitialVersion[brand].version,
+      },
+    })
+
+    const prefixCard = cardPrefixNumber[brand]
 
     const newCard = this.creditCardRepository.create({
       cardNumber: generateUniqueNumber(user.id, 16, prefixCard),
       cvv: this.tarjetasService.generateCVV(),
       expirationDate: this.tarjetasService.generateExpirationDate(),
-      interestRate: INTEREST_CARD[marca],
-      marca,
-      monthMaxWithoutInterest: BENEFIT_WITHOUT_INTEREST[marca],
-      quota: InitialVersion[marca].limit,
-      user: user,
-      version: InitialVersion[marca].version,
+      quota: brand_version.limit,
+      user,
+      version: brand_version,
     })
-
     const currentCard = await this.creditCardRepository.save(newCard)
-
     const movement = this.movementRepository.create({
       creditCard: { id: currentCard.id },
       description: saveTranslation({
         args: {
+          brand: `${brand_version.brand.name} | ${brand_version.limit}`,
           date: formatDate(currentCard.createdAt, 'DD MMM'),
-          marca: `${marca} | ${version}`,
         },
         key: 'movements.MOV_CREDIT_CREATE',
       }),
       title: fullName(user),
-      totalBalance: user.account?.balance || 0,
+      totalBalance: 0,
       typeMovement: TypeMovement.CARD,
       user: { id: user.id },
     })
-
     await this.movementRepository.save(movement)
     return newCard
   }
 
-  async createCreditCard(req, marca: TypeCredit) {
+  async createCreditCard(req, brand: TypeCredit) {
     const user = await this.userRepository.findOne({
-      relations: [EntitiesType.CREDIT_CARD, EntitiesType.ACCOUNT],
+      relations: [
+        EntitiesType.CREDIT_CARD,
+        EntitiesType.RS_CREDIT_VERSION_BRAND,
+      ],
       where: { id: req.user.id },
     })
 
-    await this.createCreditBase(user, marca)
+    await this.createCreditBase(user, brand)
 
     return HttpResponseSuccess(
       this.i18n.t('tarjetas.CREATE_CREDIT'),
@@ -113,14 +115,17 @@ export class CreditCardService {
     )
   }
 
-  async createCreditCardReceipt(req, marca: TypeCredit) {
+  async createCreditCardReceipt(req, brand: TypeCredit) {
     const user = await this.userRepository.findOne({
-      relations: [EntitiesType.CREDIT_CARD, EntitiesType.ACCOUNT],
+      relations: [
+        EntitiesType.CREDIT_CARD,
+        EntitiesType.RS_CREDIT_VERSION_BRAND,
+      ],
       where: { id: req.user.id },
     })
+    const newCard = await this.createCreditBase(user, brand)
 
-    const newCard = await this.createCreditBase(user, marca)
-
+    const brandCurrent = newCard.version.brand.name
     const receipt = await this.receiptService.createReceipt({
       dataReceipts: [
         { key: 'owner' },
@@ -137,26 +142,24 @@ export class CreditCardService {
           style: {
             hr: true,
           },
-          value: newCard.marca,
+          value: brandCurrent,
         },
-
-        { key: 'version', value: newCard.version },
+        { key: 'version', value: newCard.version.name },
         {
           key: 'limit',
-          value: newCard.limit,
+          value: newCard.version.limit,
         },
       ],
       description: saveTranslation({
         args: {
+          brand: brandCurrent,
           date: formatDate(new Date(), 'DD MMM'),
-          marca: newCard.marca,
         },
         key: 'movements.MOV_CREDIT_CREATE',
       }),
       title: 'newCard',
       user,
     })
-
     return HttpResponseSuccess(
       this.i18n.t('tarjetas.CREATE_CREDIT'),
       { receiptID: receipt.id },
@@ -166,55 +169,62 @@ export class CreditCardService {
 
   async getUserCreditCards(req) {
     const userId = req.user.id
-
     const creditCards = await this.creditCardRepository.find({
-      select: ['id', 'cardNumber', 'marca', 'version'],
+      select: ['id', 'cardNumber', 'version'],
       where: { user: { id: userId } },
     })
 
-    return HttpResponseSuccess(this.i18n.t('general.GET_SUCCESS'), creditCards)
+    const creditsFormat = creditCards.map((credit) => ({
+      ...credit,
+      brand: credit.version.brand.name,
+      version: credit.version.name,
+    }))
+
+    return HttpResponseSuccess(
+      this.i18n.t('general.GET_SUCCESS'),
+      creditsFormat
+    )
   }
 
   async getOffertCredit(req) {
     const userId = req.user.id
     const creditCards = await this.creditCardRepository.find({
-      select: ['marca', 'version', 'id', 'limit'],
+      relations: [EntitiesType.RS_VERSION_NEXTVERSION],
+      select: ['version', 'id'],
       where: { user: { id: userId } },
     })
 
     const availableBrands = [TypeCredit.VISA, TypeCredit.MASTERCARD]
-
     const offerts = availableBrands.reduce(
       (acc, brand) => {
-        const existingCard = creditCards.find((card) => card.marca === brand)
-
+        const existingCard = creditCards.find(
+          (card) => card.version.brand.name === brand
+        )
         if (!existingCard) {
           const initialVersionCard = InitialVersion[brand]
           acc.newCards.push({
+            brand,
             id: uuidv4(),
             limit: initialVersionCard.limit,
-            marca: brand,
             textOffert: this.i18n.t(`tarjetas.${OffertTypeCard[brand]}`),
             version: initialVersionCard.version,
           })
         } else {
-          const nextVersion = NextVersionTypeCard[brand][existingCard.version]
+          const nextVersion = existingCard.version.nextVersion
           if (nextVersion) {
             acc.increaseVersion.push({
-              currentLimit: existingCard.limit,
+              brand,
+              currentLimit: existingCard.version.limit,
               id: existingCard.id,
-              marca: brand,
               newLimit: nextVersion.limit,
-              version: nextVersion.version,
+              version: nextVersion.name,
             })
           }
         }
-
         return acc
       },
       { increaseVersion: [], newCards: [] }
     )
-
     return HttpResponseSuccess(this.i18n.t('general.GET_SUCCESS'), offerts)
   }
 
@@ -229,21 +239,24 @@ export class CreditCardService {
         HttpResponseStatus.NOT_FOUND
       )
     }
-    return HttpResponseSuccess(this.i18n.t('general.GET_SUCCESS'), creditCard)
+    return HttpResponseSuccess(this.i18n.t('general.GET_SUCCESS'), {
+      ...creditCard,
+      brand: creditCard.version.brand.name,
+      limit: creditCard.version.limit,
+      version: creditCard.version.name,
+    })
   }
 
   async updateCreditCardStatus(req, id) {
     const creditCard = await this.creditCardRepository.findOne({
       where: { id, user: { id: req.user.id } },
     })
-
     if (!creditCard) {
       ThrowHttpException(
         this.i18n.t('tarjetas.CREDIT_NOT_FOUND'),
         HttpResponseStatus.NOT_FOUND
       )
     }
-
     const nextStatus: Record<CardStatus, CardStatus> = {
       [CardStatus.ACTIVE]: CardStatus.BLOCKED,
       [CardStatus.BLOCKED]: CardStatus.ACTIVE,
@@ -258,7 +271,7 @@ export class CreditCardService {
     )
   }
 
-  async updateVersion(creditCard) {
+  async updateVersion(creditCard: CreditCard) {
     if (!creditCard) {
       ThrowHttpException(
         this.i18n.t('tarjetas.CREDIT_NOT_FOUND'),
@@ -266,8 +279,7 @@ export class CreditCardService {
       )
     }
 
-    const nextVersion =
-      NextVersionTypeCard[creditCard.marca][creditCard.version]
+    const nextVersion = creditCard.version.nextVersion
 
     if (!nextVersion) {
       ThrowHttpException(
@@ -275,19 +287,16 @@ export class CreditCardService {
         HttpResponseStatus.CONFLICT
       )
     }
-
     const newCredit = await this.creditCardRepository.save({
       ...creditCard,
-      limit: nextVersion.limit,
-      version: nextVersion.version,
+      version: nextVersion,
     })
-
     const movement = await this.movementRepository.create({
       creditCard: { id: creditCard.id },
       description: saveTranslation({
         args: {
           date: formatDate(new Date(), 'DD MMM'),
-          version: nextVersion.version,
+          version: nextVersion.name,
         },
         key: 'movements.NEW_VERSION_CREDIT',
       }),
@@ -302,22 +311,24 @@ export class CreditCardService {
 
   async upgradeCreditCardVersion(req, id) {
     const creditCard = await this.creditCardRepository.findOne({
-      relations: [EntitiesType.USER],
+      relations: [EntitiesType.USER, EntitiesType.RS_VERSION_NEXTVERSION],
       where: { id, user: { id: req.user.id } },
     })
 
     const versionUpdate = await this.updateVersion(creditCard)
-
     return HttpResponseSuccess(
       this.i18n.t('tarjetas.UPGRADE_VERSION_SUCCESS'),
-      { limit: versionUpdate.limit, nextVersion: versionUpdate.version },
+      {
+        limit: versionUpdate.version.limit,
+        nextVersion: versionUpdate.version.name,
+      },
       HttpResponseStatus.OK
     )
   }
 
   async createReceiptUpdgradeVersion(req, id) {
     const creditCard = await this.creditCardRepository.findOne({
-      relations: [EntitiesType.USER],
+      relations: [EntitiesType.USER, EntitiesType.RS_VERSION_NEXTVERSION],
       where: { id, user: { id: req.user.id } },
     })
     const versionUpdate = await this.updateVersion(creditCard)
@@ -337,19 +348,18 @@ export class CreditCardService {
           style: {
             hr: true,
           },
-          value: creditCard.marca,
+          value: creditCard.version.brand.name,
         },
-
-        { key: 'version', value: creditCard.version },
+        { key: 'version', value: creditCard.version.name },
         {
           key: 'limit',
           style: {
             hr: true,
           },
-          value: creditCard.limit,
+          value: creditCard.version.limit,
         },
-        { key: 'newVersion', value: versionUpdate.version },
-        { key: 'newLimit', value: versionUpdate.limit },
+        { key: 'newVersion', value: versionUpdate.version.name },
+        { key: 'newLimit', value: versionUpdate.version.limit },
       ],
       description: saveTranslation({
         args: {
@@ -361,12 +371,11 @@ export class CreditCardService {
       title: 'newVersion',
       user: creditCard.user,
     })
-
     return HttpResponseSuccess(
       this.i18n.t('tarjetas.UPGRADE_VERSION_SUCCESS'),
       {
-        limit: versionUpdate.limit,
-        nextVersion: versionUpdate.version,
+        limit: versionUpdate.version.limit,
+        nextVersion: versionUpdate.version.name,
         receiptID: receipt.id,
       },
       HttpResponseStatus.OK

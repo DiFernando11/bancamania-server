@@ -1,6 +1,6 @@
 export enum TypeCredit {
-  MASTERCARD = 'mastercard',
-  VISA = 'visa',
+  MASTERCARD = 'MASTERCARD',
+  VISA = 'VISA',
 }
 
 export enum VisaCard {

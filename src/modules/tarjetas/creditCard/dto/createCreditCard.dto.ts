@@ -5,5 +5,5 @@ export class CreateCreditCardDto {
   @IsEnum(TypeCredit, {
     message: 'La marca debe ser visa o mastercard',
   })
-  marca: TypeCredit
+  brand: TypeCredit
 }

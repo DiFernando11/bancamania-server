@@ -1,5 +1,7 @@
 export enum EntitiesType {
   ACCOUNT = 'account',
+  BRAND = 'brand',
+  VERSION = 'version',
   DEBIT_CARD = 'debitCard',
   RS_DEBIT_ACCOUNT = 'debitCard.account',
   CREDIT_CARD = 'creditCards',
@@ -7,4 +9,7 @@ export enum EntitiesType {
   MOVEMENTS = 'movements',
   CONTACT_ACCOUNT = 'contactAccount',
   RS_USER_ACCOUNT = 'account.user',
+  RS_CREDIT_VERSION_BRAND = 'creditCards.version.brand',
+  RS_VERSION_BRAND = 'version.brand',
+  RS_VERSION_NEXTVERSION = 'version.nextVersion',
 }

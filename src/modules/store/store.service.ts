@@ -206,7 +206,6 @@ export class StoreService {
     dto: PurchaseItemsStoreDto
   }) {
     const { idCard, deferredMonth, products } = dto
-
     const creditCard = user.creditCards.find((card) => card.id === idCard)
     if (!creditCard) {
       ThrowHttpException(
@@ -214,14 +213,12 @@ export class StoreService {
         HttpResponseStatus.NOT_FOUND
       )
     }
-    const interest = INTEREST_CARD[creditCard.marca]
-    const monthsWithoutInteret = BENEFIT_WITHOUT_INTEREST[creditCard.marca]
-
+    const interest = creditCard.version.interestRate
+    const monthsWithoutInteret =
+      creditCard.version.maxInstallmentsWithoutInterest
     const interestMonth =
       deferredMonth > monthsWithoutInteret ? deferredMonth * interest : 0
-
     await this.getInformationPurchaseProducts({ interestMonth, products })
-
     return HttpResponseSuccess(this.i18n.t('store.PURCHASE_SUCCESS'), {
       receiptID: '12',
     })
