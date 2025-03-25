@@ -25,7 +25,7 @@ export class CreditCardController {
   ) {
     return this.creditCardService.createCreditCard(
       req,
-      createCreditCardDto.marca
+      createCreditCardDto.brand
     )
   }
 
@@ -37,7 +37,7 @@ export class CreditCardController {
   ) {
     return this.creditCardService.createCreditCardReceipt(
       req,
-      createCreditCardDto.marca
+      createCreditCardDto.brand
     )
   }
 

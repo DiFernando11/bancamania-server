@@ -1,5 +1,6 @@
 import {
   Column,
+  CreateDateColumn,
   Entity,
   ManyToOne,
   OneToMany,
@@ -8,11 +9,7 @@ import {
 } from 'typeorm'
 import { DeferredPurchase } from '@/src/modules/deferredInstallment/deferredPurchase.entity'
 import { Movement } from '@/src/modules/movements/movements.entity'
-import {
-  CreditCardVersion,
-  TypeCredit,
-} from '@/src/modules/tarjetas/creditCard/enums/creditEnum'
-import { INITIAL_LIMIT } from '@/src/modules/tarjetas/creditCard/utils/credit'
+import { CreditCardVersion } from '@/src/modules/tarjetas/creditCard/creditCardVersions.entity'
 import { CardStatus } from '@/src/modules/tarjetas/enum/cardStatus.enum'
 import { Usuario } from '@/src/modules/users/users.entity'
 
@@ -22,44 +19,32 @@ export class CreditCard {
   @PrimaryGeneratedColumn('uuid')
   id: string
 
-  @Column({ nullable: false, unique: true })
+  @Column({ unique: true })
   cardNumber: string
 
-  @Column({ nullable: false })
+  @Column()
   expirationDate: string
 
-  @Column({ default: () => 'CURRENT_TIMESTAMP', type: 'timestamp' })
+  @CreateDateColumn()
   createdAt: Date
 
-  @Column({ nullable: false })
+  @Column()
   cvv: string
-
-  @Column({ nullable: false })
-  marca: TypeCredit
-
-  @Column({ nullable: false })
-  version: CreditCardVersion
 
   @Column({ default: 100 })
   miles: number
 
-  @Column({ default: INITIAL_LIMIT, nullable: false, type: 'decimal' })
-  limit: number
-
-  @Column({ nullable: false, type: 'decimal' })
+  @Column('decimal', { precision: 12, scale: 2 })
   quota: number
 
-  @Column({ nullable: false, type: 'decimal' })
-  interestRate: number
-
-  @Column({ nullable: false })
-  monthMaxWithoutInterest: number
-
-  @Column({ default: CardStatus.BLOCKED, nullable: false })
+  @Column({ default: CardStatus.BLOCKED })
   status: CardStatus
 
   @ManyToOne(() => Usuario, (user) => user.creditCards, { onDelete: 'CASCADE' })
   user: Usuario
+
+  @ManyToOne(() => CreditCardVersion, { eager: true })
+  version: CreditCardVersion
 
   @OneToMany(() => Movement, (movement) => movement.creditCard)
   movements: Movement[]

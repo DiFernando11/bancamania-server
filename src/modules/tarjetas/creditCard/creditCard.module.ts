@@ -11,6 +11,8 @@ import { ReceiptsService } from '@/src/modules/receipts/receipts.service'
 import { CreditCardController } from '@/src/modules/tarjetas/creditCard/creditCard.controller'
 import { CreditCard } from '@/src/modules/tarjetas/creditCard/creditCard.entity'
 import { CreditCardService } from '@/src/modules/tarjetas/creditCard/creditCard.service'
+import { CreditCardBrand } from '@/src/modules/tarjetas/creditCard/creditCardBrand.entity'
+import { CreditCardVersion } from '@/src/modules/tarjetas/creditCard/creditCardVersions.entity'
 import { TarjetasService } from '@/src/modules/tarjetas/tarjetas.service'
 import { UsersService } from '@/src/modules/users/users.service'
 import { JwtStrategy } from '@/src/strategies/jwt.strategy'
@@ -28,6 +30,8 @@ import { JwtStrategy } from '@/src/strategies/jwt.strategy'
     TypeOrmModule.forFeature([Usuario]),
     TypeOrmModule.forFeature([Movement]),
     TypeOrmModule.forFeature([Receipt]),
+    TypeOrmModule.forFeature([CreditCardBrand]),
+    TypeOrmModule.forFeature([CreditCardVersion]),
   ],
   providers: [
     JwtStrategy,

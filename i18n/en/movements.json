@@ -2,7 +2,7 @@
   "CREATE_MOVE": "Movement successfully created",
   "DETAIL_MOVEMENT": "DETAIL OF MOVEMENTS",
   "MOV_ACCOUNT_CREATE": "Savings account created on {date}",
-  "MOV_CREDIT_CREATE": "Credit card {marca} created {date}",
+  "MOV_CREDIT_CREATE": "Credit card {brand} created {date}",
   "MOV_DEBIT_CREATE": "Debit card created {date}",
   "MOV_GIFT_BALANCE": "You’ve received a gift! Money has been deposited into your savings account.",
   "MOV_RECEIVE_TRANSFER": "You received a transfer from {balance} - {date}",
