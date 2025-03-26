@@ -9,6 +9,7 @@
   "INSUFFICIENT_QUOTA": "Quota insufficient.",
   "MASTER_BENEFIT": "Enjoy months without interest",
   "MAX_VERSION_UPDATE": "You have already reached the maximum version available for your card.",
+  "MILES": "{miles} miles",
   "STATUS_UPDATED": "Card status has been successfully changed.",
   "UPGRADE_VERSION_SUCCESS": "Your card version has been successfully upgraded.",
   "VISA_BENEFIT": "Earn more miles with every purchase"

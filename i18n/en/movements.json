@@ -8,6 +8,9 @@
   "MOV_RECEIVE_TRANSFER": "You received a transfer from {balance} - {date}",
   "MOV_SEND_TRANSFER": "You sent a transfer of {balance} - {date}",
   "NEW_VERSION_CREDIT": "You have purchased a new version of your card - {version} - {date}",
+  "PURCHASE_CREDIT": "You made a purchase with your credit card {balance} - {date}",
+  "PURCHASE_CREDIT_DEFERRED": "You made a purchase with your credit card deferred to {month} months, with installments of {quotas} - {date}",
+  "PURCHASE_CREDIT_MILES": "You made a purchase with your credit card {balance} miles - {date}",
   "PURCHASE_DEBIT": "You made a purchase with your debit card of {balance} - {date}",
   "STATEMENT": "STATEMENT"
 }
