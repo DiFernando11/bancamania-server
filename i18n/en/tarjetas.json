@@ -7,8 +7,10 @@
   "DEBIT_EXISTS": "The user already has a registered credit card.",
   "DEBIT_NOT_FOUND": "The debit card could not be found.",
   "INSUFFICIENT_QUOTA": "Quota insufficient.",
+  "INSUF_MILES": "You don't have enough miles to complete your purchase.",
   "MASTER_BENEFIT": "Enjoy months without interest",
   "MAX_VERSION_UPDATE": "You have already reached the maximum version available for your card.",
+  "MILES": "{miles} miles",
   "STATUS_UPDATED": "Card status has been successfully changed.",
   "UPGRADE_VERSION_SUCCESS": "Your card version has been successfully upgraded.",
   "VISA_BENEFIT": "Earn more miles with every purchase"

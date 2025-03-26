@@ -7,8 +7,10 @@
   "DEBIT_EXISTS": "El usuario ya tiene una tarjeta de debito registrada.",
   "DEBIT_NOT_FOUND": "No se pudo encontrar la tarjeta de débito",
   "INSUFFICIENT_QUOTA": "Cuota insuficiente.",
+  "INSUF_MILES": "No tienes las millas suficientes para completar tu compra",
   "MASTER_BENEFIT": "Disfruta de meses sin intereses",
   "MAX_VERSION_UPDATE": "Ya has alcanzado la versión máxima disponible para tu tarjeta.",
+  "MILES": "{miles} millas",
   "STATUS_UPDATED": "Estado de la tarjeta se ha modificado con exito",
   "UPGRADE_VERSION_SUCCESS": "La versión de tu tarjeta se ha actualizado con éxito.",
   "VISA_BENEFIT": "Acumula mas millas con cada compra"
