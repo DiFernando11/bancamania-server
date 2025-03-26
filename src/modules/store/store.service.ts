@@ -334,7 +334,7 @@ export class StoreService {
         if (isMethodMiles) {
           if (creditCard.miles < total) {
             ThrowHttpException(
-              this.i18n.t('tarjetas.CREDIT_NOT_FOUND'),
+              this.i18n.t('tarjetas.INSUF_MILES'),
               HttpResponseStatus.NOT_FOUND
             )
           }
