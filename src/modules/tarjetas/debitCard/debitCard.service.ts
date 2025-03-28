@@ -80,10 +80,16 @@ export class DebitCardService {
 
   async getCardDebit(req) {
     const debitCard = await this.debitCardRepository.findOne({
+      relations: [EntitiesType.ACCOUNT],
       where: { user: { id: req.user.id } },
     })
 
-    return HttpResponseSuccess(this.i18n.t('general.GET_SUCCESS'), debitCard)
+    return HttpResponseSuccess(this.i18n.t('general.GET_SUCCESS'), {
+      ...debitCard,
+      account: {
+        balance: debitCard.account.balance,
+      },
+    })
   }
 
   async updateDebitCardStatus(req) {

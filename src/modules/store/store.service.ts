@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { I18nService } from 'nestjs-i18n'
-import { EntityManager, In, Repository } from 'typeorm'
+import { In, Repository } from 'typeorm'
 import { HttpResponseStatus } from '@/src/common/constants'
 import {
   bitcoinSymbol,
@@ -172,7 +172,8 @@ export class StoreService {
       const productQuantity = products.find((pr) => pr.id === item.id)
       return [
         {
-          key: item.title,
+          key: 'title',
+          value: this.i18n.t(`store.${item.title}`),
         },
         {
           key: 'quantity',

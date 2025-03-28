@@ -9,7 +9,7 @@ export class CreditCardVersion {
   @Column()
   name: string
 
-  @Column('decimal', { precision: 5, scale: 2 })
+  @Column('decimal', { precision: 5, scale: 3 })
   interestRate: number
 
   @Column('int')

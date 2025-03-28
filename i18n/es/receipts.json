@@ -24,6 +24,7 @@
   "quantity": "Cantidad",
   "reason": "Motivo",
   "receipt": "Comprobante {rec}",
+  "title": "Titulo",
   "titleTransfer": "Transferencia exitosa",
   "total": "Total",
   "totalItem": "Valor total del producto",
