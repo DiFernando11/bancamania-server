@@ -24,6 +24,7 @@
   "quantity": "Quantity",
   "reason": "Reason",
   "receipt": "Receipt {rec}",
+  "title": "Title",
   "titleTransfer": "Transfer successful",
   "total": "Total",
   "totalItem": "Total value of the product",

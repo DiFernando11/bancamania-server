@@ -170,13 +170,18 @@ export class CreditCardService {
   async getUserCreditCards(req) {
     const userId = req.user.id
     const creditCards = await this.creditCardRepository.find({
-      select: ['id', 'cardNumber', 'version'],
+      select: ['id', 'cardNumber', 'version', 'quota', 'miles'],
       where: { user: { id: userId } },
     })
 
     const creditsFormat = creditCards.map((credit) => ({
       ...credit,
       brand: credit.version.brand.name,
+      interestRate: credit.version.interestRate,
+      maxInstallmentsWithoutInterest:
+        credit.version.maxInstallmentsWithoutInterest,
+      miles: credit.miles,
+      quota: credit.quota,
       version: credit.version.name,
     }))
 
