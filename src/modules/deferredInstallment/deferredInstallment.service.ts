@@ -1,7 +1,14 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { I18nContext, I18nService } from 'nestjs-i18n'
-import { EntityManager, Repository } from 'typeorm'
+import {
+  addMonths,
+  differenceInDays,
+  getMonth,
+  getYear,
+  isBefore,
+} from 'date-fns'
+import { I18nService } from 'nestjs-i18n'
+import { EntityManager, LessThanOrEqual, Repository } from 'typeorm'
 import { HttpResponseStatus } from '@/src/common/constants'
 import { HttpResponseSuccess, ThrowHttpException } from '@/src/common/utils'
 import { DeferredInstallment } from '@/src/modules/deferredInstallment/deferredInstallment.entity'
@@ -14,6 +21,8 @@ export class DeferredInstallmentService {
   constructor(
     @InjectRepository(CreditCard)
     private readonly cardRepo: Repository<CreditCard>,
+    @InjectRepository(DeferredInstallment)
+    private readonly deferredInstallRepository: Repository<DeferredInstallment>,
     private readonly i18n: I18nService
   ) {}
 
@@ -58,7 +67,7 @@ export class DeferredInstallmentService {
     creditCard: CreditCard,
     dto: CreateDeferredPurchaseDto
   ) => {
-    const { total, deferredMonth } = dto
+    const { total, deferredMonth, description } = dto
 
     if (creditCard.quota < total) {
       ThrowHttpException(
@@ -82,6 +91,7 @@ export class DeferredInstallmentService {
 
     const deferredPurchase = manager.getRepository(DeferredPurchase).create({
       creditCard,
+      description,
       interestRate: Number(interestTotal) === 0 ? 0 : interestRate,
       originalAmount: total,
       totalAmount: parseFloat(totalWithInterest),
@@ -91,15 +101,19 @@ export class DeferredInstallmentService {
     await manager.getRepository(DeferredPurchase).save(deferredPurchase)
 
     const now = new Date()
+
+    const firstDueDate = new Date(getYear(now), getMonth(now) + 1, 15)
+
     const installments: DeferredInstallment[] = []
 
     for (let i = 0; i < deferredMonth; i++) {
-      const dueDate = new Date(now)
-      dueDate.setMonth(dueDate.getMonth() + i)
+      const dueDate = addMonths(firstDueDate, i)
+
       let monthlyAmount = installment
       if (i === deferredMonth - 1) {
         monthlyAmount = parseFloat((monthlyAmount + adjustment).toFixed(2))
       }
+
       installments.push(
         manager.getRepository(DeferredInstallment).create({
           amount: monthlyAmount,
@@ -149,5 +163,101 @@ export class DeferredInstallmentService {
     const quotas = await this.createQuotas(creditCard, dto)
 
     return HttpResponseSuccess(this.i18n.t('general.GET_SUCCESS'), quotas)
+  }
+
+  async getPendingInstallmentsForCurrentMonth(req, creditCardId: string) {
+    const now = new Date()
+    const cutoffDate = new Date(now.getFullYear(), now.getMonth() + 1, 15)
+
+    const installments = await this.deferredInstallRepository.find({
+      order: { dueDate: 'ASC' },
+      relations: {
+        deferredPurchase: {
+          creditCard: {
+            user: true,
+            version: true,
+          },
+        },
+      },
+      where: {
+        deferredPurchase: {
+          creditCard: {
+            id: creditCardId,
+            user: {
+              id: req.user.id,
+            },
+          },
+        },
+        paid: false,
+      },
+    })
+
+    if (!installments) {
+      ThrowHttpException(
+        this.i18n.t('tarjetas.CREDIT_NOT_FOUND'),
+        HttpResponseStatus.CONFLICT
+      )
+    }
+
+    let minimumPayment = 0
+    let totalAmount = 0
+    let totalPaymentAtOnce = 0
+
+    const detailedInstallments = installments.map((i) => {
+      const amount = Number(i.amount)
+      const dueDate = i.dueDate
+      const isOverdue = isBefore(dueDate, now)
+      const overdueDays = isOverdue ? differenceInDays(now, dueDate) : 0
+
+      const deferredPurchase = i.deferredPurchase
+      const monthlyLateRate =
+        deferredPurchase.creditCard.version.latePaymentInterestRate
+      const dailyLateRate = monthlyLateRate / 30
+
+      const lateFee = isOverdue
+        ? parseFloat((amount * dailyLateRate * overdueDays).toFixed(2))
+        : 0
+
+      const totalToPay = parseFloat((amount + lateFee).toFixed(2))
+
+      if (isOverdue) {
+        minimumPayment += totalToPay
+      } else {
+        minimumPayment += amount * 0.05
+      }
+
+      if (
+        isBefore(dueDate, cutoffDate) ||
+        dueDate.getTime() === cutoffDate.getTime()
+      ) {
+        totalAmount += totalToPay
+      }
+
+      totalPaymentAtOnce += totalToPay
+
+      return {
+        amount,
+        dayOfpurchase: deferredPurchase.createdAt,
+        description: this.i18n.t(`store.${deferredPurchase.description}`),
+        dueDate,
+        id: i.id,
+        installmentNumber: i.installmentNumber,
+        isOverdue,
+        lateFee,
+        overdueDays,
+        paid: i.paid,
+        totalInstallments: deferredPurchase.totalInstallments,
+        totalToPay,
+        versionName: deferredPurchase.creditCard.version.name,
+      }
+    })
+
+    return HttpResponseSuccess(this.i18n.t('general.GET_SUCCESS'), {
+      installments: detailedInstallments.filter((i) => i.dueDate <= cutoffDate),
+      lastDayWithoutInterest: cutoffDate,
+      minimumPayment: parseFloat(minimumPayment.toFixed(2)),
+      totalAmount: parseFloat(totalAmount.toFixed(2)),
+      totalPaymentAtOnce: parseFloat(totalPaymentAtOnce.toFixed(2)),
+    })
   }
 }

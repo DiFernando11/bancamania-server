@@ -325,6 +325,7 @@ export class StoreService {
               {
                 cardId: creditCard.id,
                 deferredMonth,
+                description: 'BANCA_STORE',
                 total,
               }
             )
