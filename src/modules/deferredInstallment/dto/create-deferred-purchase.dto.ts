@@ -1,4 +1,11 @@
-import { IsInt, IsNumber, IsUUID, Min } from 'class-validator'
+import {
+  IsInt,
+  IsNumber,
+  IsOptional,
+  IsString,
+  IsUUID,
+  Min,
+} from 'class-validator'
 
 export class CreateDeferredPurchaseDto {
   @IsUUID(undefined, {
@@ -24,4 +31,8 @@ export class CreateDeferredPurchaseDto {
     message: 'IS_MIN_ONE',
   })
   deferredMonth: number
+
+  @IsOptional()
+  @IsString()
+  description?: string
 }

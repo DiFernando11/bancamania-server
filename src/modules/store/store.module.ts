@@ -6,7 +6,10 @@ import { Usuario } from 'src/modules/users/users.entity'
 import { Account } from '@/src/modules/account/account.entity'
 import { AccountService } from '@/src/modules/account/account.service'
 import { ContactAccount } from '@/src/modules/contacts/contactAccounts.entity'
-import { DeferredInstallmentService } from '@/src/modules/deferredInstallment'
+import {
+  DeferredInstallment,
+  DeferredInstallmentService,
+} from '@/src/modules/deferredInstallment'
 import { Movement } from '@/src/modules/movements/movements.entity'
 import { MovementsService } from '@/src/modules/movements/movements.service'
 import { PdfService } from '@/src/modules/pdf/pdf.service'
@@ -35,6 +38,7 @@ import { JwtStrategy } from '../../strategies/jwt.strategy'
     TypeOrmModule.forFeature([ContactAccount]),
     TypeOrmModule.forFeature([Receipt]),
     TypeOrmModule.forFeature([CreditCard]),
+    TypeOrmModule.forFeature([DeferredInstallment]),
   ],
   providers: [
     JwtStrategy,

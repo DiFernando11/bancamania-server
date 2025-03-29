@@ -24,6 +24,7 @@
   "IS_GREATER_ZERO": "The field must be greater than 0",
   "IS_MIN_ONE": "The minimum quantity is 1",
   "IS_NUMBER": "The field must be a number",
+  "IS_REQUIRED": "The field must be a required",
   "IS_STRING": "The field must be a string",
   "IS_UUID": "The field must be a valid",
   "IS_WHOLE_NUMBER": "The field must be an integer",

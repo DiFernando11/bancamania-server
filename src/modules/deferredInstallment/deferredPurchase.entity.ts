@@ -17,6 +17,9 @@ export class DeferredPurchase {
   @ManyToOne(() => CreditCard, (card) => card.deferredPurchases)
   creditCard: CreditCard
 
+  @Column({ nullable: true })
+  description: string
+
   @Column('decimal', { precision: 12, scale: 2 })
   originalAmount: number
 

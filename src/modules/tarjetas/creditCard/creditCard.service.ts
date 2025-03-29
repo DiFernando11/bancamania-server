@@ -244,6 +244,7 @@ export class CreditCardService {
         HttpResponseStatus.NOT_FOUND
       )
     }
+
     return HttpResponseSuccess(this.i18n.t('general.GET_SUCCESS'), {
       ...creditCard,
       brand: creditCard.version.brand.name,

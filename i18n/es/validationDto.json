@@ -23,6 +23,7 @@
   "IS_GREATER_ZERO": "El campo debe ser mayor a 0",
   "IS_MIN_ONE": "La cantidad mínima es 1",
   "IS_NUMBER": "El campo debe ser un numero",
+  "IS_REQUIRED": "El campo es requerido",
   "IS_STRING": "El campo debe ser un string",
   "IS_UUID": "El campo debe ser un UUID valido",
   "IS_WHOLE_NUMBER": "El campo debe ser un numero entero",
