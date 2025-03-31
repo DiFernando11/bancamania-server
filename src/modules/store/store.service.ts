@@ -32,9 +32,9 @@ export class StoreService {
     private readonly storeRepository: Repository<Store>,
     @InjectRepository(Usuario)
     private readonly userRepository: Repository<Usuario>,
-    @InjectRepository(Account)
-    private readonly creditCardRepository: Repository<CreditCard>,
     @InjectRepository(CreditCard)
+    private readonly creditCardRepository: Repository<CreditCard>,
+    @InjectRepository(Account)
     private readonly accountRepository: Repository<Account>,
     private readonly deferredInstallmentService: DeferredInstallmentService,
     private readonly i18n: I18nService
@@ -329,6 +329,16 @@ export class StoreService {
                 total,
               }
             )
+
+          const milesEarned = Math.floor(
+            deferredCredit.totalAmountWithInterest *
+              creditCard.version.mileEarnRate
+          )
+
+          await manager
+            .getRepository(CreditCard)
+            .save({ ...creditCard, miles: creditCard.miles + milesEarned })
+
           totalPurchase = deferredCredit.totalAmountWithInterest
           installment = deferredCredit.installment
           interestTotal = deferredCredit.interestTotal

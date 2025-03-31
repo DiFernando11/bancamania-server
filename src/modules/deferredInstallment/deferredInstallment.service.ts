@@ -5,14 +5,27 @@ import {
   differenceInDays,
   getMonth,
   getYear,
+  isAfter,
   isBefore,
 } from 'date-fns'
 import { I18nService } from 'nestjs-i18n'
-import { EntityManager, LessThanOrEqual, Repository } from 'typeorm'
+import { EntityManager, Repository } from 'typeorm'
 import { HttpResponseStatus } from '@/src/common/constants'
-import { HttpResponseSuccess, ThrowHttpException } from '@/src/common/utils'
+import {
+  balanceFormat,
+  bitcoinSymbol,
+  formatDate,
+  HttpResponseSuccess,
+  saveTranslation,
+  ThrowHttpException,
+} from '@/src/common/utils'
+import { Account } from '@/src/modules/account/account.entity'
+import { PAY_MINUM_QUOTA } from '@/src/modules/deferredInstallment/constants'
 import { DeferredInstallment } from '@/src/modules/deferredInstallment/deferredInstallment.entity'
 import { DeferredPurchase } from '@/src/modules/deferredInstallment/deferredPurchase.entity'
+import { TypeMovement } from '@/src/modules/movements/enum/type-movement.enum'
+import { Movement } from '@/src/modules/movements/movements.entity'
+import { Receipt } from '@/src/modules/receipts/receipts.entity'
 import { CreditCard } from '@/src/modules/tarjetas/creditCard/creditCard.entity'
 import { CreateDeferredPurchaseDto } from './dto/create-deferred-purchase.dto'
 
@@ -23,6 +36,8 @@ export class DeferredInstallmentService {
     private readonly cardRepo: Repository<CreditCard>,
     @InjectRepository(DeferredInstallment)
     private readonly deferredInstallRepository: Repository<DeferredInstallment>,
+    @InjectRepository(Account)
+    private readonly accountRepository: Repository<Account>,
     private readonly i18n: I18nService
   ) {}
 
@@ -205,6 +220,7 @@ export class DeferredInstallmentService {
 
     const detailedInstallments = installments.map((i) => {
       const amount = Number(i.amount)
+      const amountPaid = Number(i.amountPaid)
       const dueDate = i.dueDate
       const isOverdue = isBefore(dueDate, now)
       const overdueDays = isOverdue ? differenceInDays(now, dueDate) : 0
@@ -212,28 +228,28 @@ export class DeferredInstallmentService {
       const deferredPurchase = i.deferredPurchase
       const monthlyLateRate =
         deferredPurchase.creditCard.version.latePaymentInterestRate
-      const dailyLateRate = monthlyLateRate / 30
-
       const lateFee = isOverdue
-        ? parseFloat((amount * dailyLateRate * overdueDays).toFixed(2))
+        ? this.calculateLateFee({
+            amount,
+            dailyRate: monthlyLateRate,
+            daysLate: overdueDays,
+          })
         : 0
 
       const totalToPay = parseFloat((amount + lateFee).toFixed(2))
 
-      if (isOverdue) {
-        minimumPayment += totalToPay
-      } else {
-        minimumPayment += amount * 0.05
+      const totalAmountWithoutPay = totalToPay - amountPaid
+
+      if (!isAfter(dueDate, cutoffDate)) {
+        totalAmount += totalAmountWithoutPay
+        if (isOverdue) {
+          minimumPayment += totalAmountWithoutPay
+        } else {
+          minimumPayment += (amount - amountPaid) * PAY_MINUM_QUOTA
+        }
       }
 
-      if (
-        isBefore(dueDate, cutoffDate) ||
-        dueDate.getTime() === cutoffDate.getTime()
-      ) {
-        totalAmount += totalToPay
-      }
-
-      totalPaymentAtOnce += totalToPay
+      totalPaymentAtOnce += totalAmountWithoutPay
 
       return {
         amount,
@@ -247,7 +263,7 @@ export class DeferredInstallmentService {
         overdueDays,
         paid: i.paid,
         totalInstallments: deferredPurchase.totalInstallments,
-        totalToPay,
+        totalToPay: totalAmountWithoutPay,
         versionName: deferredPurchase.creditCard.version.name,
       }
     })
@@ -259,5 +275,183 @@ export class DeferredInstallmentService {
       totalAmount: parseFloat(totalAmount.toFixed(2)),
       totalPaymentAtOnce: parseFloat(totalPaymentAtOnce.toFixed(2)),
     })
+  }
+
+  calculateLateFee = ({
+    amount,
+    daysLate,
+    dailyRate,
+  }: {
+    amount: number
+    daysLate: number
+    dailyRate: number
+  }): number => {
+    if (daysLate <= 0 || dailyRate <= 0) return 0
+
+    const totalWithInterest =
+      Number(amount) * Math.pow(1 + Number(dailyRate), Number(daysLate))
+    const lateFee = totalWithInterest - Number(amount)
+
+    return parseFloat(lateFee.toFixed(2))
+  }
+
+  async payInstallmentsAmount(req, creditCardId: string, amount: number) {
+    return await this.deferredInstallRepository.manager.transaction(
+      async (transactionalEntityManager) => {
+        const now = new Date()
+        let remaining = Number(amount)
+
+        const installments = await transactionalEntityManager.find(
+          this.deferredInstallRepository.target,
+          {
+            relations: {
+              deferredPurchase: { creditCard: { user: { account: true } } },
+            },
+            where: {
+              deferredPurchase: {
+                creditCard: {
+                  id: creditCardId,
+                  user: { id: req.user.id },
+                },
+              },
+              paid: false,
+            },
+          }
+        )
+
+        if (!installments.length) {
+          ThrowHttpException(
+            this.i18n.t('tarjetas.QUOTA_NOT_FOUND'),
+            HttpResponseStatus.CONFLICT
+          )
+        }
+
+        const cuotasOrdenadas = installments.sort((a, b) => {
+          const aOverdue = a.dueDate < now
+          const bOverdue = b.dueDate < now
+
+          if (aOverdue && !bOverdue) return -1
+          if (!aOverdue && bOverdue) return 1
+
+          return a.dueDate.getTime() - b.dueDate.getTime()
+        })
+
+        const cuotasPagadas: DeferredInstallment[] = []
+
+        for (const cuota of cuotasOrdenadas) {
+          const isOverdue = cuota.dueDate < now
+          const amountPaid = Number(cuota.amountPaid) ?? 0
+          const overdueDays = isOverdue
+            ? differenceInDays(now, cuota.dueDate)
+            : 0
+
+          const dailyRate =
+            cuota.deferredPurchase.creditCard.version.latePaymentInterestRate
+          const lateFee = isOverdue
+            ? this.calculateLateFee({
+                amount: cuota.amount,
+                dailyRate,
+                daysLate: overdueDays,
+              })
+            : 0
+
+          const totalConInteres = Number(cuota.amount) + Number(lateFee)
+          const saldo = balanceFormat(totalConInteres - amountPaid)
+
+          if (remaining === 0) break
+          cuota.paidAt = new Date()
+
+          if (remaining >= saldo) {
+            cuota.amountPaid = amountPaid + saldo
+            cuota.paid = true
+            cuotasPagadas.push(cuota)
+            remaining = balanceFormat(remaining - saldo)
+          } else {
+            cuota.amountPaid = amountPaid + remaining
+            cuota.paidAt = new Date()
+            cuotasPagadas.push(cuota)
+            remaining = 0
+            break
+          }
+        }
+
+        const account = installments[0].deferredPurchase.creditCard.user.account
+        const payInstallment = balanceFormat(amount - remaining)
+
+        if (payInstallment > account.balance) {
+          ThrowHttpException(
+            this.i18n.t('account.INSUFFICIENT_BALANCE'),
+            HttpResponseStatus.CONFLICT
+          )
+        }
+
+        await transactionalEntityManager.save(cuotasPagadas)
+
+        await transactionalEntityManager.save(Account, {
+          ...account,
+          balance: balanceFormat(account.balance - payInstallment),
+        })
+
+        const version = installments[0].deferredPurchase.creditCard.version.name
+
+        await transactionalEntityManager.save(Movement, {
+          account: { id: account.id },
+          balance: -payInstallment,
+          description: saveTranslation({
+            args: {
+              balance: bitcoinSymbol(payInstallment),
+              brand: version,
+              date: formatDate(new Date(), 'DD MMM'),
+            },
+            key: 'movements.PAY_CREDIT',
+          }),
+          title: this.i18n.t('movements.THANKS_PAY_CREDIT'),
+          totalBalance: balanceFormat(account.balance - payInstallment),
+          typeMovement: TypeMovement.WALLET,
+          user: { id: req.user.id },
+        })
+
+        const receipt = await transactionalEntityManager.save(Receipt, {
+          dataReceipts: [
+            {
+              key: 'detailCard',
+              style: {
+                hr: true,
+              },
+            },
+            {
+              key: 'version',
+              value: version,
+            },
+            {
+              key: 'numberCard',
+              style: {
+                hr: true,
+              },
+              value: installments[0].deferredPurchase.creditCard.cardNumber,
+            },
+            {
+              key: 'total',
+              value: bitcoinSymbol(payInstallment),
+            },
+          ],
+          description: saveTranslation({
+            args: {
+              balance: bitcoinSymbol(payInstallment),
+              brand: version,
+              date: formatDate(new Date(), 'DD MMM'),
+            },
+            key: 'movements.PAY_CREDIT',
+          }),
+          title: 'titlePayInstallments',
+          user: { id: req.user.id },
+        })
+
+        return HttpResponseSuccess(this.i18n.t('tarjetas.PAY_QUOTA_SUCCESS'), {
+          amountUsed: payInstallment,
+          receiptID: receipt.id,
+        })
+      }
+    )
   }
 }

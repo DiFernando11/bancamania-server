@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common'
 import { UUIDDto } from '@/src/common/dto'
 import { JwtAuthGuard } from '@/src/guards/jwt-auth.guard'
+import { PayInstallmentsDto } from '@/src/modules/deferredInstallment/dto/pay-installment.dto'
 import { DeferredInstallmentService } from './deferredInstallment.service'
 import { CreateDeferredPurchaseDto } from './dto/create-deferred-purchase.dto'
 
@@ -27,6 +28,23 @@ export class DeferredInstallmentController {
     return this.deferredInstallmentService.createDeferredPurchase(
       req,
       createDeferredPurchaseDto
+    )
+  }
+
+  @Post(':uuid/pay')
+  @UseGuards(JwtAuthGuard)
+  async payInstallmentsAmount(
+    @Req() req: Request,
+    @Param() params: UUIDDto,
+    @Body() body: PayInstallmentsDto
+  ) {
+    const { uuid } = params
+    const { amount } = body
+
+    return this.deferredInstallmentService.payInstallmentsAmount(
+      req,
+      uuid,
+      amount
     )
   }
 

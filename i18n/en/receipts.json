@@ -25,6 +25,7 @@
   "reason": "Reason",
   "receipt": "Receipt {rec}",
   "title": "Title",
+  "titlePayInstallments": "Card payment successful",
   "titleTransfer": "Transfer successful",
   "total": "Total",
   "totalItem": "Total value of the product",

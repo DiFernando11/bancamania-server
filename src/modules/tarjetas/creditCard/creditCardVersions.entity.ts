@@ -12,8 +12,11 @@ export class CreditCardVersion {
   @Column('decimal', { precision: 5, scale: 3 })
   interestRate: number
 
-  @Column('decimal', { precision: 5, scale: 2 })
+  @Column('decimal', { precision: 5, scale: 3 })
   latePaymentInterestRate?: number
+
+  @Column('decimal', { nullable: true, precision: 5, scale: 3 })
+  mileEarnRate?: number
 
   @Column('int')
   maxInstallmentsWithoutInterest: number

@@ -11,6 +11,8 @@
   "MASTER_BENEFIT": "Disfruta de meses sin intereses",
   "MAX_VERSION_UPDATE": "Ya has alcanzado la versión máxima disponible para tu tarjeta.",
   "MILES": "{miles} millas",
+  "PAY_QUOTA_SUCCESS": "Pago de cuotas exitoso",
+  "QUOTA_NOT_FOUND": "No hay cuotas pendientes para pagar.",
   "STATUS_UPDATED": "Estado de la tarjeta se ha modificado con exito",
   "UPGRADE_VERSION_SUCCESS": "La versión de tu tarjeta se ha actualizado con éxito.",
   "VISA_BENEFIT": "Acumula mas millas con cada compra"
