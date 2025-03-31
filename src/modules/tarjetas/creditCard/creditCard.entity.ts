@@ -31,7 +31,7 @@ export class CreditCard {
   @Column()
   cvv: string
 
-  @Column({ default: 100 })
+  @Column({ default: 5000 })
   miles: number
 
   @Column('decimal', { precision: 12, scale: 2 })

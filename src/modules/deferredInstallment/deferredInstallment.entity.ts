@@ -17,6 +17,9 @@ export class DeferredInstallment {
   @Column('decimal', { precision: 12, scale: 2 })
   amount: number
 
+  @Column('decimal', { nullable: true, precision: 12, scale: 2 })
+  amountPaid: number
+
   @Column('timestamp')
   dueDate: Date
 

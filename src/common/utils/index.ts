@@ -1,3 +1,4 @@
+export { balanceFormat } from './balanceFormat'
 export { bitcoinSymbol } from './bitcoinSymbol'
 export { createFilterDate } from './createFilterDate'
 export { createPaginationData } from './createPaginationData'

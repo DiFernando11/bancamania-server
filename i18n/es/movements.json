@@ -9,9 +9,11 @@
   "MOV_RECEIVE_TRANSFER": "Recibiste una transferencia de {balance} - {date}",
   "MOV_SEND_TRANSFER": "Enviaste una transferencia de {balance} - {date}",
   "NEW_VERSION_CREDIT": "Has adquirido una nueva versión de tu tarjeta - {version} - {date}",
+  "PAY_CREDIT": "Realizó el pago de su tarjeta de credito {brand} de {balance} - {date}",
   "PURCHASE_CREDIT": "Realizó una compra con su tarjeta de crédito {balance} - {date}",
   "PURCHASE_CREDIT_DEFERRED": "Realizó una compra con su tarjeta de crédito diferida a {month} meses, con cuotas de {quotas} - {date}",
   "PURCHASE_CREDIT_MILES": "Realizó una compra con su tarjeta de crédito {miles} millas - {date}",
   "PURCHASE_DEBIT": "Realizó una compra con su tarjeta de débito de {balance} - {date}",
-  "STATEMENT": "ESTADO DE CUENTA"
+  "STATEMENT": "ESTADO DE CUENTA",
+  "THANKS_PAY_CREDIT": "Gracias por el pago de tu tarjeta."
 }

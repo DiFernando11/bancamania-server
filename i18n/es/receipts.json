@@ -25,6 +25,7 @@
   "reason": "Motivo",
   "receipt": "Comprobante {rec}",
   "title": "Titulo",
+  "titlePayInstallments": "Pago de tarjeta exitoso",
   "titleTransfer": "Transferencia exitosa",
   "total": "Total",
   "totalItem": "Valor total del producto",

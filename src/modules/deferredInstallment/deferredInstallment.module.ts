@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config'
 import { JwtModule } from '@nestjs/jwt'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { Usuario } from 'src/modules/users/users.entity'
+import { Account } from '@/src/modules/account/account.entity'
 import { DeferredInstallment } from '@/src/modules/deferredInstallment/deferredInstallment.entity'
 import { DeferredPurchase } from '@/src/modules/deferredInstallment/deferredPurchase.entity'
 import { Movement } from '@/src/modules/movements/movements.entity'
@@ -33,6 +34,7 @@ import { DeferredInstallmentService } from './deferredInstallment.service'
     TypeOrmModule.forFeature([Receipt]),
     TypeOrmModule.forFeature([DeferredPurchase]),
     TypeOrmModule.forFeature([CreditCardVersion]),
+    TypeOrmModule.forFeature([Account]),
   ],
   providers: [
     JwtStrategy,
