@@ -4,6 +4,7 @@ import {
   Get,
   Param,
   Post,
+  Query,
   Req,
   Res,
   UseGuards,
@@ -51,12 +52,12 @@ export class DeferredInstallmentController {
     )
   }
 
-  @Post(':uuid/pdf/statement')
+  @Get(':uuid/pdf/statement')
   @UseGuards(JwtAuthGuard)
   async generateStatementCreditPdf(
     @Req() req,
     @Param() params: UUIDDto,
-    @Body() dto: GenerateStatementDto,
+    @Query() queryParams: GenerateStatementDto,
     @Res() res: Response
   ) {
     const { uuid } = params
@@ -65,7 +66,7 @@ export class DeferredInstallmentController {
       await this.deferredInstallmentService.generateStatementCreditPdf(
         req,
         uuid,
-        dto
+        queryParams
       )
 
     res.setHeader('Content-Type', 'application/pdf')
@@ -76,7 +77,14 @@ export class DeferredInstallmentController {
     res.end(pdfBuffer)
   }
 
-  @Get('/:uuid')
+  @Get('/:uuid/mothsStatement')
+  @UseGuards(JwtAuthGuard)
+  async getAvailablePeriods(@Req() req: Request, @Param() params: UUIDDto) {
+    const { uuid } = params
+    return this.deferredInstallmentService.getAvailablePeriods(req, uuid)
+  }
+
+  @Get(':uuid')
   @UseGuards(JwtAuthGuard)
   async getPendingInstallmentsForCurrentMonth(
     @Req() req: Request,

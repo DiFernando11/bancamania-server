@@ -3,12 +3,14 @@ import { InjectRepository } from '@nestjs/typeorm'
 import {
   addMonths,
   differenceInDays,
+  format,
   getMonth,
   getYear,
   isAfter,
   isBefore,
   isEqual,
   parse,
+  setDate,
 } from 'date-fns'
 import { I18nService } from 'nestjs-i18n'
 import { EntityManager, LessThanOrEqual, Repository } from 'typeorm'
@@ -564,7 +566,6 @@ export class DeferredInstallmentService {
               user: { id: req.user.id },
             },
           },
-          dueDate: LessThanOrEqual(end),
         },
       })
 
@@ -675,5 +676,50 @@ export class DeferredInstallmentService {
     `
 
     return await this.pdfService.generatePdfBuffer(htmlContent)
+  }
+
+  async getAvailablePeriods(req, creditID) {
+    const creditCard = await this.cardRepo.findOne({
+      select: ['createdAt', 'user', 'id'],
+      where: { id: creditID, user: { id: req.user.id } },
+    })
+
+    if (!creditCard) {
+      ThrowHttpException(
+        this.i18n.t('tarjetas.CREDIT_NOT_FOUND'),
+        HttpResponseStatus.NOT_FOUND
+      )
+    }
+
+    const result: { id: string; text: string }[] = []
+    const creationDate = creditCard.createdAt
+
+    const now = new Date()
+    const limit =
+      now.getDate() >= 15
+        ? new Date(now.getFullYear(), now.getMonth(), 1)
+        : new Date(now.getFullYear(), now.getMonth() - 1, 1)
+
+    let current = new Date(
+      creationDate.getFullYear(),
+      creationDate.getMonth(),
+      1
+    )
+
+    while (!isBefore(limit, current)) {
+      let start = setDate(new Date(current), 16)
+      if (isBefore(start, creditCard.createdAt)) {
+        start = creditCard.createdAt
+      }
+      const end = setDate(addMonths(current, 1), 15)
+      result.push({
+        id: format(current, 'MM/yy'),
+        text: `${format(start, 'MM-dd')} - ${format(end, 'MM-dd')}`,
+      })
+
+      current = addMonths(current, 1)
+    }
+
+    return HttpResponseSuccess(this.i18n.t('general.GET_SUCCESS'), result)
   }
 }
