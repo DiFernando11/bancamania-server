@@ -14,7 +14,9 @@ export class DeferredPurchase {
   @PrimaryGeneratedColumn('uuid')
   id: string
 
-  @ManyToOne(() => CreditCard, (card) => card.deferredPurchases)
+  @ManyToOne(() => CreditCard, (card) => card.deferredPurchases, {
+    onDelete: 'CASCADE',
+  })
   creditCard: CreditCard
 
   @Column({ nullable: true })

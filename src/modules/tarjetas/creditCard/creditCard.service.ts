@@ -293,8 +293,11 @@ export class CreditCardService {
         HttpResponseStatus.CONFLICT
       )
     }
+    const currentUsedQuota = creditCard.version.limit - creditCard.quota
+
     const newCredit = await this.creditCardRepository.save({
       ...creditCard,
+      quota: nextVersion.limit - currentUsedQuota,
       version: nextVersion,
     })
     const movement = await this.movementRepository.create({

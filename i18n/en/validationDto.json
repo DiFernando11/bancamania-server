@@ -42,6 +42,7 @@
   "PASSWORD_SPECIAL_CHAR": "The password must contain at least one special character (@, $, !, %, *, ?, &).",
   "PASSWORD_STRING": "The password must be a string.",
   "PASSWORD_UPPERCASE": "The password must contain at least one uppercase letter.",
+  "PERIDO_NOT_FOUND": "Period must be in MM/YY format",
   "PHONE_REQUIRED": "The phone number is required.",
   "REFRESH_TOKEN_REQUIRED": "The refresh token is required.",
   "RELATIONS_ARRAY": "Relations must be an array",
