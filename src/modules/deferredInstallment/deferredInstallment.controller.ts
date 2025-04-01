@@ -5,13 +5,16 @@ import {
   Param,
   Post,
   Req,
+  Res,
   UseGuards,
 } from '@nestjs/common'
+import { Request, Response } from 'express'
 import { UUIDDto } from '@/src/common/dto'
 import { JwtAuthGuard } from '@/src/guards/jwt-auth.guard'
 import { PayInstallmentsDto } from '@/src/modules/deferredInstallment/dto/pay-installment.dto'
 import { DeferredInstallmentService } from './deferredInstallment.service'
 import { CreateDeferredPurchaseDto } from './dto/create-deferred-purchase.dto'
+import { GenerateStatementDto } from './dto/generate-statement-credit.dto'
 
 @Controller('deferredInstallment')
 export class DeferredInstallmentController {
@@ -46,6 +49,31 @@ export class DeferredInstallmentController {
       uuid,
       amount
     )
+  }
+
+  @Post(':uuid/pdf/statement')
+  @UseGuards(JwtAuthGuard)
+  async generateStatementCreditPdf(
+    @Req() req,
+    @Param() params: UUIDDto,
+    @Body() dto: GenerateStatementDto,
+    @Res() res: Response
+  ) {
+    const { uuid } = params
+
+    const pdfBuffer =
+      await this.deferredInstallmentService.generateStatementCreditPdf(
+        req,
+        uuid,
+        dto
+      )
+
+    res.setHeader('Content-Type', 'application/pdf')
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename=comprobante_${uuid}.pdf`
+    )
+    res.end(pdfBuffer)
   }
 
   @Get('/:uuid')
